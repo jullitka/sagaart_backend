@@ -2,6 +2,7 @@ from django.db import models
 
 from constants import ORIENTATION_CHOICES, SALE_STATUS_CHOICES
 
+from users.models import User
 
 class EducationModel(models.Model):
     """Модель образовательного учрежления"""
@@ -154,7 +155,7 @@ class ArtworkModel(models.Model):
         on_delete=models.CASCADE
     )
     user = models.ForeignKey(
-        UserModel,
+        User,
         verbose_name='Продавец',
         on_delete=models.CASCADE
     )
