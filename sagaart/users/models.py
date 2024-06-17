@@ -1,0 +1,110 @@
+from django.db import models
+from django.contrib.auth.models import AbstractBaseUser
+from users.manager import CustomUserManager
+
+
+class PermUser:
+
+    def has_perm(self, perm, obj=None):
+        return self.is_staff
+    
+    def has_module_perms(self, app_label):
+       return self.is_staff
+
+
+class Subscribe(models.Model):
+    price = models.IntegerField('Cтоиvость подписки')
+    sub_time = models.CharField('Срок подписки', max_length=40) # | models.DurationField()
+
+    def __str__(self):
+        return (f'Длительность {self.sub_time[:40]} Стоимость {self.price}')
+    
+    class Meta:
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
+        ordering = ['-sub_time']
+
+# TODO
+class UserSubscribe(models.Model):
+    user_id = models.ForeignKey(
+        'User',
+        on_delete=models.CASCADE
+    )
+    subscribe = models.ForeignKey(
+        Subscribe,
+        on_delete=models.CASCADE
+    )
+    time_off = models.DateField(
+        blank=True
+    )
+    
+    class Meta:
+        verbose_name = 'Подписка пользователя'
+        verbose_name_plural = 'Подписки пользователей'
+
+
+class User(AbstractBaseUser, PermUser):
+    
+    class UserStatus(models.TextChoices):
+        USER = 'user'
+        ARTIST = 'artist'
+        IN_SERVICE = 'in_service'
+
+    
+    name = models.CharField(
+        'Имя',
+        max_length=20,
+        null=False,
+        blank=False
+    )
+    surname = models.CharField(
+        'Фамилия',
+        max_length=20,
+        null=False,
+        blank=False
+    )
+    email = models.EmailField(
+        'Адрес почты',
+        unique=True,
+        null=False,
+        blank=False
+    )
+    phone_number = models.CharField(
+        'Номер телефона',
+        max_length=20,
+        unique=True,
+        null=False,
+        blank=False
+    )
+    status = models.CharField(
+        'Статус пользователя',
+        choices=UserStatus.choices,
+        default=UserStatus.USER
+    )
+    subscription = models.ForeignKey(
+        UserSubscribe,
+        on_delete=models.CASCADE,
+        default=None,
+        blank=True,
+        null=True
+    )
+    approval = models.BooleanField(
+        'Согласие на обработку ПД',
+        default=False
+    )
+    is_staff = models.BooleanField(
+        default=False
+    )
+
+    objects = CustomUserManager()
+
+    USERNAME_FIELD = 'email'
+
+    REQUIRED_FIELDS = ['name', 'surname', 'phone_number']
+
+    def __str__(self):
+        return f'mail={self.email}, name={self.name}, status={self.status}'
+    
+    class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
