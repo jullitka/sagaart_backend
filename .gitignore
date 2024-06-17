@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# TODO
+*/users/views.py
+*/users/migrations/
+*Dockerfile
 # C extensions
 *.so
 

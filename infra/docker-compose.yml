@@ -1,5 +1,16 @@
-services: 
- 
+services:
+  #django:
+  #  container_name: django
+  #  build: .
+  #  restart: always
+    #command: 
+    #- python manage.py runserver localhost:8000
+  #  ports:
+  #    - 8000:8000
+  #  depends_on:
+  #    - db
+
+      
   db: 
     image: postgres:13-alpine 
     env_file: 
@@ -7,7 +18,8 @@ services:
     volumes: 
       - db_value:/var/lib/postgresql/data/
     ports:
-      - "5432:5432"
+      - 5432:5432
+
  
 volumes: 
   db_value:
