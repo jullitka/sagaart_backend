@@ -39,6 +39,8 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='127.0.0.1, localhost').split
 # Application definition
 
 INSTALLED_APPS = [
+    'users.apps.UsersConfig',
+    'artworks.apps.ArtworksConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
