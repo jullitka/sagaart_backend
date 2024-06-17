@@ -1,6 +1,6 @@
 from django.db import models
 
-from constants import ORIENTATION_CHOICES, SALE_STATUS_CHOICES
+from .constants import ORIENTATION_CHOICES, SALE_STATUS_CHOICES
 
 from users.models import User
 
@@ -32,6 +32,8 @@ class ArtistModel(models.Model):
     education = models.ForeignKey(
         EducationModel,
         verbose_name='Образование автора',
+        on_delete=models.SET_NULL,
+        null=True
     )
     about_artist = models.CharField(
         verbose_name='Об авторе',
@@ -55,11 +57,13 @@ class EducationAuthorModel(models.Model):
     """Модель связи образотвальельных учреждени и атворов"""
     artist = models.ForeignKey(
         ArtistModel,
-        verbose_name='Имя и фамилия автора'
+        verbose_name='Имя и фамилия автора',
+        on_delete=models.CASCADE
     )
     education = models.ForeignKey(
         EducationModel,
-        verbose_name='Название учебного заведения'
+        verbose_name='Название учебного заведения',
+        on_delete=models.CASCADE
     )
     education_start = models.IntegerField(
         verbose_name='Год начала обучения',
@@ -86,7 +90,8 @@ class SeriesModel(models.Model):
     )
     author = models.ForeignKey(
         ArtistModel,
-        verbose_name='Автор серии'
+        verbose_name='Автор серии',
+        on_delete=models.CASCADE
     )
 
     class Meta:
@@ -130,11 +135,13 @@ class ExhibitionParticipantModel(models.Model):
     """Модель связи выставок с их участниками"""
     exhibition = models.ForeignKey(
         ExhibitionModel,
-        verbose_name='Выставка'
+        verbose_name='Выставка',
+        on_delete=models.CASCADE
     )
     participant = models.ForeignKey(
         ArtistModel,
-        verbose_name = 'Участник выставки'
+        verbose_name = 'Участник выставки',
+        on_delete=models.CASCADE
     )
 
     def __str__(self):
@@ -178,7 +185,9 @@ class ArtworkModel(models.Model):
     )
     series = models.ForeignKey(
         SeriesModel,
-        verbose_name='Серия работ'
+        verbose_name='Серия работ',
+        on_delete=models.SET_NULL,
+        null=True
     )
     is_estimate = models.BooleanField(
         verbose_name='Оценка получена',
@@ -186,7 +195,7 @@ class ArtworkModel(models.Model):
     )
     is_on_sold = models.CharField(
         verbose_name='Статус продажи',
-        choices_name=SALE_STATUS_CHOICES,
+        choices=SALE_STATUS_CHOICES,
         null=False,
         blank=False,
         default='не размещено'
