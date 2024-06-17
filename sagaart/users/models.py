@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from users.manager import CustomUserManager
 
-
 class PermUser:
 
     def has_perm(self, perm, obj=None):
