@@ -31,22 +31,23 @@ SECRET_KEY = os.getenv('SECRET_KEY', default='token')
 SECRET_KEY = 'django-insecure-osf+vwjtn9_gimz_m6wjzx%7hhu#1xps$7bq*td^d%_c3&og6&'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True #os.getenv('DEBUG') == 'True' 
+DEBUG = True # os.getenv('DEBUG') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='127.0.0.1, localhost').split(',') 
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='127.0.0.1, localhost').split(',')
 
 
 # Application definition
 
 INSTALLED_APPS = [
     'users.apps.UsersConfig',
-    'artworks.apps.ArtworksConfig',  
+    'artworks.apps.ArtworksConfig',
+    'artists.apps.ArtistsConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles', 
+    'django.contrib.staticfiles',
 ]
 
 AUTH_USER_MODEL = 'users.User'
