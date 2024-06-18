@@ -13,11 +13,11 @@ class PermUser:
 
 class Subscribe(models.Model):
     price = models.IntegerField('Cтоимость подписки')
-    sub_time = models.CharField('Срок подписки', max_length=40) # | models.DurationField()
+    sub_time = models.IntegerField('Срок подписки') # | models.DurationField()
 
     def __str__(self):
-        return (f'Длительность {self.sub_time[:40]} Стоимость {self.price}')
-    
+        return (f'Длительность {self.sub_time} Стоимость {self.price}')
+
     class Meta:
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
@@ -36,9 +36,9 @@ class UserSubscribe(models.Model):
         related_name='user_sub'
     )
     time_off = models.DateField(
-        blank=True
+        blank=True,
     )
-    
+
     class Meta:
         verbose_name = 'Подписка пользователя'
         verbose_name_plural = 'Подписки пользователей'

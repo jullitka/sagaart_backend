@@ -14,7 +14,8 @@ class UserAdmin(admin.ModelAdmin):
         'email',
         'phone_number',
         'status',
-        'subscription'
+        'subscription',
+        'is_staff'
     )
     list_filter = ('status', )
 

@@ -41,6 +41,7 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='127.0.0.1, localhost').split
 INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'artworks.apps.ArtworksConfig',
+    'api.apps.ApiConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -48,9 +49,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'djoser',
-    'api',
-    'users',
-    'rest_framework'
+    'rest_framework',
+    'rest_framework.authtoken'
 ]
 AUTH_USER_MODEL = 'users.User'
 MIDDLEWARE = [
@@ -141,7 +141,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # REST 
-REST_FRAMEWORK: {
+REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
@@ -149,8 +149,7 @@ REST_FRAMEWORK: {
         'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 21,
-    'DEFAULT_FILTER_BACKENDS': ['django_filter.rest_framework.DjangoFilterBackend']
+    'PAGE_SIZE': 21
 }
 
 #Djoser
@@ -158,9 +157,8 @@ DJOSER = {
     'PERMISSIONS': {
         'user_list': ['rest_framework.permissions.AllowAny'],
         'user': ['api.permissions.IsOwnerProfileOrReadOnly'],
-        'me': ['rest_framework.permissions.IsAuthenticated']
+        'me': ['api.permissions.IsOwnerProfile']
     },
-    'HIDE_USERS': True,
     'SERIALIZERS': {
         'user_create': 'api.serializers.UserCreateSerializer',
         'user': 'api.serializers.UserRetriveSerializer',
