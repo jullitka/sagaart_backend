@@ -1,5 +1,7 @@
 from django.db import models
 
+from users.models import User
+
 
 class EducationModel(models.Model):
     """Модель образовательного учрежления"""
@@ -25,6 +27,13 @@ class ArtistModel(models.Model):
         null=False,
         blank=False,
         max_length=200
+    )
+    user = models.ForeignKey(
+        User,
+        verbose_name='Пользователь',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL
     )
     education = models.ForeignKey(
         EducationModel,
@@ -143,3 +152,29 @@ class ExhibitionParticipantModel(models.Model):
 
     def __str__(self):
         return f'{self.participant} участвовал в {self.exhibition}'
+    
+
+class FavoriteArtist(models.Model):
+    """Модель избранных произведений искусства"""
+    artist = models.ForeignKey(
+        ArtistModel,
+        verbose_name='Автор',
+        on_delete=models.CASCADE
+    )
+    user = models.ForeignKey(
+        User,
+        verbose_name='Ценитель творчества автора',
+        on_delete=models.CASCADE
+    )
+
+    class Meta:
+        verbose_name = 'Любимый художник'
+        verbose_name_plural = 'Любимые художники'
+        constraints = [
+            models.UniqueConstraint(
+                fields=('artist', 'user'), name='favorite_artist'
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.artist} в любимых художниках у {self.user}'
