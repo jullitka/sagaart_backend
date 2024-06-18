@@ -35,11 +35,10 @@ class ArtistModel(models.Model):
         blank=True,
         on_delete=models.SET_NULL
     )
-    about_artist = models.CharField(
+    about_artist = models.TextField(
         verbose_name='Об авторе',
         null=False,
         blank=False,
-        max_length=200
     )
     photo = models.ImageField(
         verbose_name='Фото автора'
