@@ -2,150 +2,42 @@ from django.db import models
 
 from .constants import ORIENTATION_CHOICES, SALE_STATUS_CHOICES
 
+from artists.models import ArtistModel, SeriesModel
 from users.models import User
 
-class EducationModel(models.Model):
-    """Модель образовательного учрежления"""
+
+class CategoryModel(models.Model):
+    """Модель категорий"""
     name = models.CharField(
-        verbose_name='Название образовательного учреждения',
-        null=False,
-        blank=False,
-        max_length=200
-    )
-
-    class Meta:
-        verbose_name = 'Образовательное учреждение'
-        verbose_name_plural = 'Образовательные учреждения'
-
-    def __str__(self):
-        return f'{self.name}'
-
-
-class ArtistModel(models.Model):
-    """Модель автора произведений"""
-    name = models.CharField(
-        verbose_name='Имя и фамилия',
-        null=False,
-        blank=False,
-        max_length=200
-    )
-    education = models.ForeignKey(
-        EducationModel,
-        verbose_name='Образование автора',
-        on_delete=models.SET_NULL,
-        null=True
-    )
-    about_artist = models.CharField(
-        verbose_name='Об авторе',
-        null=False,
-        blank=False,
-        max_length=200
-    )
-    photo = models.ImageField(
-        verbose_name='Фото автора'
-    )
-
-    class Meta:
-        verbose_name = 'Автор'
-        verbose_name_plural = 'Авторы'
-
-    def __str__(self):
-        return f'{self.name}'
-
-
-class EducationAuthorModel(models.Model):
-    """Модель связи образотвальельных учреждени и атворов"""
-    artist = models.ForeignKey(
-        ArtistModel,
-        verbose_name='Имя и фамилия автора',
-        on_delete=models.CASCADE
-    )
-    education = models.ForeignKey(
-        EducationModel,
-        verbose_name='Название учебного заведения',
-        on_delete=models.CASCADE
-    )
-    education_start = models.IntegerField(
-        verbose_name='Год начала обучения',
+        verbose_name='Категория',
+        null=True,
         blank=True,
-        null=True
+        max_length=100
     )
-    education_finish = models.IntegerField(
-        verbose_name='Год окончания обучения',
+
+    class Meta:
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
+
+    def __str__(self):
+        return f'{self.name}'
+
+
+class StyleModel(models.Model):
+    """Модель стилей"""
+    name = models.CharField(
+        verbose_name='Стиль',
+        null=True,
         blank=True,
-        null=True
-    )
-
-    def __str__(self):
-        return f'{self.artist} учился в {self.education}'
-
-
-class SeriesModel(models.Model):
-    """Модель серии работ"""
-    name = models.CharField(
-        verbose_name='Название серии',
-        null=False,
-        blank=False,
-        max_length=200
-    )
-    author = models.ForeignKey(
-        ArtistModel,
-        verbose_name='Автор серии',
-        on_delete=models.CASCADE
+        max_length=100
     )
 
     class Meta:
-        verbose_name = 'Серия работ'
-        verbose_name_plural = 'Серии работ'
+        verbose_name = 'Стиль'
+        verbose_name_plural = 'Стили'
 
     def __str__(self):
         return f'{self.name}'
-
-
-class ExhibitionModel(models.Model):
-    """Модель выставки"""
-    name = models.CharField(
-        verbose_name='Название выставки',
-        null=False,
-        blank=False,
-        max_length=200
-    )
-    period = models.CharField(
-        verbose_name='Период проведения выставки',
-        null=False,
-        blank=False,
-        max_length=50
-    )
-    address = models.CharField(
-        verbose_name='Место проведения выставки',
-        null=False,
-        blank=False,
-        max_length=200
-    ) 
-
-    class Meta:
-        verbose_name = 'Выставка'
-        verbose_name_plural = 'Выставки'
-
-    def __str__(self):
-        return f'{self.name}'
-
-
-class ExhibitionParticipantModel(models.Model):
-    """Модель связи выставок с их участниками"""
-    exhibition = models.ForeignKey(
-        ExhibitionModel,
-        verbose_name='Выставка',
-        on_delete=models.CASCADE
-    )
-    participant = models.ForeignKey(
-        ArtistModel,
-        verbose_name = 'Участник выставки',
-        on_delete=models.CASCADE
-    )
-
-    def __str__(self):
-        return f'{self.participant} участвовал в {self.exhibition}'
 
 
 class ArtworkModel(models.Model):
@@ -208,11 +100,20 @@ class ArtworkModel(models.Model):
         blank=True,
         max_length=100
     )
-    style = models.CharField(
+    style = models.ForeignKey(
+        StyleModel,
         verbose_name='Стиль работы',
         null=True,
         blank=True,
-        max_length=100
+        on_delete=models.SET_NULL
+    )
+
+    category = models.ForeignKey(
+        CategoryModel,
+        verbose_name='Категория',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL
     )
 
     decoration = models.CharField(
@@ -239,25 +140,23 @@ class ArtworkModel(models.Model):
         return f'{self.name}, {self.author}'
 
 
-class ArtworkPrice(models.Model):
+class ArtworkPriceModel(models.Model):
     """Модель цен на произведения искусства и их копии"""
     artwork = models.ForeignKey(
         ArtworkModel,
         verbose_name='Произведение искусства',
         on_delete=models.CASCADE
     )
-    original_price = models.CharField(
+    original_price = models.IntegerField(
         verbose_name='Цена оригинала',
         null=False,
         blank=False,
-        max_length=200
     )
     # может быть пустым, если произведение - не картина
-    copy_price = models.CharField(
+    copy_price = models.IntegerField(
         verbose_name='Цена постера',
         null=True,
         blank=True,
-        max_length=200
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
@@ -271,3 +170,29 @@ class ArtworkPrice(models.Model):
 
     def __str__(self):
         return f'{self.artwork} на {self.pub_date}'
+
+
+class FavoriteArtworkModel(models.Model):
+    """Модель избранных произведений искусства"""
+    artwork = models.ForeignKey(
+        ArtworkModel,
+        verbose_name='Произведение искусства',
+        on_delete=models.CASCADE
+    )
+    user = models.ForeignKey(
+        User,
+        verbose_name='Ценитель искусства',
+        on_delete=models.CASCADE
+    )
+
+    class Meta:
+        verbose_name = 'Избранное произведение'
+        verbose_name_plural = 'Избранные произведения'
+        constraints = [
+            models.UniqueConstraint(
+                fields=('artwork', 'user'), name='favorite_artwork'
+            )
+        ]
+
+    def __str__(self):
+        return f'{self.artwork} в избранном {self.user}'
