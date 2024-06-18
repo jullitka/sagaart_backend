@@ -47,6 +47,12 @@ class OrderModel(models.Model):
         blank=False,
         max_length=100
     )
+    comment = models.TextField(
+        verbose_name='Комментарий к заказу',
+        null=True,
+        blank=True,
+        max_length=500
+    )
     payment_method = models.CharField(
         verbose_name='Способ оплаты',
         choices=PAYMENT_METHOD_CHOICES,
@@ -54,7 +60,6 @@ class OrderModel(models.Model):
         blank=False,
         max_length=100
     )
-
     cost = models.IntegerField(
         verbose_name='Стоимость заказа',
         null=False,
@@ -65,6 +70,13 @@ class OrderModel(models.Model):
         verbose_name='Дата оформления заказа',
         db_index=True
     )
+
+    class Meta:
+        verbose_name = 'Заказ'
+        verbose_name_plural = 'Заказ'
+
+    def __str__(self):
+        return f'Заказ №{self.id} {self.buyer}'
 
 
 class PurchaseModel(models.Model):
@@ -84,6 +96,10 @@ class PurchaseModel(models.Model):
         verbose_name='Заказ',
         on_delete=models.CASCADE
     )
+    in_delivery = models.BooleanField(
+        verbose_name='Передано в доставку',
+        default=False
+    )
     is_delivered = models.BooleanField(
         verbose_name='Доставлено',
         default=False
@@ -98,4 +114,4 @@ class PurchaseModel(models.Model):
         verbose_name_plural = 'Покупки'
 
     def __str__(self):
-        return f'{self.buyer} купил {self.artwork}'
+        return f'{self.artwork} из заказа {self.order}'

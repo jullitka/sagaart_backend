@@ -35,12 +35,6 @@ class ArtistModel(models.Model):
         blank=True,
         on_delete=models.SET_NULL
     )
-    education = models.ForeignKey(
-        EducationModel,
-        verbose_name='Образование автора',
-        on_delete=models.SET_NULL,
-        null=True
-    )
     about_artist = models.CharField(
         verbose_name='Об авторе',
         null=False,
@@ -81,6 +75,10 @@ class EducationAuthorModel(models.Model):
         blank=True,
         null=True
     )
+
+    class Meta:
+        verbose_name = 'Образование автора'
+        verbose_name_plural = 'Образование авторов'
 
     def __str__(self):
         return f'{self.artist} учился в {self.education}'
@@ -127,7 +125,7 @@ class ExhibitionModel(models.Model):
         null=False,
         blank=False,
         max_length=200
-    ) 
+    )
 
     class Meta:
         verbose_name = 'Выставка'
@@ -150,11 +148,15 @@ class ExhibitionParticipantModel(models.Model):
         on_delete=models.CASCADE
     )
 
+    class Meta:
+        verbose_name = 'Выставка автора'
+        verbose_name_plural = 'Выставки авторов'
+
     def __str__(self):
         return f'{self.participant} участвовал в {self.exhibition}'
-    
 
-class FavoriteArtist(models.Model):
+
+class FavoriteArtistModel(models.Model):
     """Модель избранных произведений искусства"""
     artist = models.ForeignKey(
         ArtistModel,
@@ -168,8 +170,8 @@ class FavoriteArtist(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Любимый художник'
-        verbose_name_plural = 'Любимые художники'
+        verbose_name = 'Любимый автор'
+        verbose_name_plural = 'Любимые авторы'
         constraints = [
             models.UniqueConstraint(
                 fields=('artist', 'user'), name='favorite_artist'
@@ -177,4 +179,4 @@ class FavoriteArtist(models.Model):
         ]
 
     def __str__(self):
-        return f'{self.artist} в любимых художниках у {self.user}'
+        return f'{self.artist} в любимых авторах у {self.user}'

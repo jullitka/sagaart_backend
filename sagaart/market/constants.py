@@ -6,4 +6,3 @@ PAYMENT_METHOD_CHOICES = (
     ('online', 'онлайн'),
     ('on_receiving', 'приполучении'),
 )
-

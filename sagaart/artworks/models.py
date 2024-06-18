@@ -97,7 +97,7 @@ class ArtworkModel(models.Model):
         return f'{self.name}, {self.author}'
 
 
-class ArtworkPrice(models.Model):
+class ArtworkPriceModel(models.Model):
     """Модель цен на произведения искусства и их копии"""
     artwork = models.ForeignKey(
         ArtworkModel,
@@ -131,7 +131,7 @@ class ArtworkPrice(models.Model):
         return f'{self.artwork} на {self.pub_date}'
 
 
-class FavoriteArtwork(models.Model):
+class FavoriteArtworkModel(models.Model):
     """Модель избранных произведений искусства"""
     artwork = models.ForeignKey(
         ArtworkModel,
