@@ -6,6 +6,40 @@ from artists.models import ArtistModel, SeriesModel
 from users.models import User
 
 
+class CategoryModel(models.Model):
+    """Модель категорий"""
+    name = models.CharField(
+        verbose_name='Категория',
+        null=True,
+        blank=True,
+        max_length=100
+    )
+
+    class Meta:
+        verbose_name = 'Категория'
+        verbose_name_plural = 'Категории'
+
+    def __str__(self):
+        return f'{self.name}'
+
+
+class StyleModel(models.Model):
+    """Модель стилей"""
+    name = models.CharField(
+        verbose_name='Стиль',
+        null=True,
+        blank=True,
+        max_length=100
+    )
+
+    class Meta:
+        verbose_name = 'Стиль'
+        verbose_name_plural = 'Стили'
+
+    def __str__(self):
+        return f'{self.name}'
+
+
 class ArtworkModel(models.Model):
     """Модель произведения искусства."""
     name = models.CharField(
@@ -66,11 +100,20 @@ class ArtworkModel(models.Model):
         blank=True,
         max_length=100
     )
-    style = models.CharField(
+    style = models.ForeignKey(
+        StyleModel,
         verbose_name='Стиль работы',
         null=True,
         blank=True,
-        max_length=100
+        on_delete=models.SET_NULL
+    )
+
+    category = models.ForeignKey(
+        CategoryModel,
+        verbose_name='Категория',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL
     )
 
     decoration = models.CharField(
@@ -104,18 +147,16 @@ class ArtworkPriceModel(models.Model):
         verbose_name='Произведение искусства',
         on_delete=models.CASCADE
     )
-    original_price = models.CharField(
+    original_price = models.IntegerField(
         verbose_name='Цена оригинала',
         null=False,
         blank=False,
-        max_length=200
     )
     # может быть пустым, если произведение - не картина
-    copy_price = models.CharField(
+    copy_price = models.IntegerField(
         verbose_name='Цена постера',
         null=True,
         blank=True,
-        max_length=200
     )
     pub_date = models.DateTimeField(
         auto_now_add=True,
