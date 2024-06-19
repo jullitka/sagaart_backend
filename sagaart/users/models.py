@@ -1,12 +1,17 @@
-from django.db import models
+from datetime import datetime, timedelta
+
+import jwt
 from django.contrib.auth.models import AbstractBaseUser
+from django.db import models
+
 from users.manager import CustomUserManager
+
 
 class PermUser:
 
     def has_perm(self, perm, obj=None):
         return self.is_staff
-    
+
     def has_module_perms(self, app_label):
        return self.is_staff
 
@@ -17,7 +22,7 @@ class Subscribe(models.Model):
 
     def __str__(self):
         return (f'Длительность {self.sub_time[:40]} Стоимость {self.price}')
-    
+
     class Meta:
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
@@ -36,20 +41,21 @@ class UserSubscribe(models.Model):
     time_off = models.DateField(
         blank=True
     )
-    
+
     class Meta:
         verbose_name = 'Подписка пользователя'
         verbose_name_plural = 'Подписки пользователей'
 
 
 class User(AbstractBaseUser, PermUser):
-    
-    class UserStatus(models.TextChoices):
-        USER = 'user'
-        ARTIST = 'artist'
-        IN_SERVICE = 'in_service'
 
-    
+    class UserStatus(models.TextChoices):
+        USER = 'Покупатель'
+        ADMIN = 'Администратор'
+        MODER = 'Модератор'
+        SALER_COLLECT = 'Продавец коллекционер'
+        SALER_ARTIST = 'Продавец художник'
+
     name = models.CharField(
         'Имя',
         max_length=20,

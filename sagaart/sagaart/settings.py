@@ -15,7 +15,6 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -31,15 +30,14 @@ SECRET_KEY = os.getenv('SECRET_KEY', default='token')
 SECRET_KEY = 'django-insecure-osf+vwjtn9_gimz_m6wjzx%7hhu#1xps$7bq*td^d%_c3&og6&'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True #os.getenv('DEBUG') == 'True' 
+DEBUG = True  # os.getenv('DEBUG') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='127.0.0.1, localhost').split(',') 
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='127.0.0.1, localhost').split(',')
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'users.apps.UsersConfig',
     'artworks.apps.ArtworksConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -47,9 +45,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'djoser',
+    'api',
+    'users',
+    'django_filters',
+    'rest_framework'
     
 ]
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+}
+
 AUTH_USER_MODEL = 'users.User'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

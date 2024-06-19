@@ -1,8 +1,9 @@
 from django.db import models
 
+from users.models import User
+
 from .constants import ORIENTATION_CHOICES, SALE_STATUS_CHOICES
 
-from users.models import User
 
 class EducationModel(models.Model):
     """Модель образовательного учрежления"""
@@ -33,16 +34,18 @@ class ArtistModel(models.Model):
         EducationModel,
         verbose_name='Образование автора',
         on_delete=models.SET_NULL,
-        null=True
+        null=True,
+        blank=True
     )
     about_artist = models.CharField(
         verbose_name='Об авторе',
-        null=False,
-        blank=False,
+        null=True,
+        blank=True,
         max_length=200
     )
     photo = models.ImageField(
-        verbose_name='Фото автора'
+        verbose_name='Фото автора',
+        blank=True, null=True
     )
 
     class Meta:
@@ -121,7 +124,7 @@ class ExhibitionModel(models.Model):
         null=False,
         blank=False,
         max_length=200
-    ) 
+    )
 
     class Meta:
         verbose_name = 'Выставка'
@@ -140,7 +143,7 @@ class ExhibitionParticipantModel(models.Model):
     )
     participant = models.ForeignKey(
         ArtistModel,
-        verbose_name = 'Участник выставки',
+        verbose_name='Участник выставки',
         on_delete=models.CASCADE
     )
 
@@ -229,6 +232,18 @@ class ArtworkModel(models.Model):
     )
     image = models.ImageField(
         verbose_name='Фото работы'
+    )
+    description = models.TextField(
+        verbose_name='Описание картины',
+        null=True, blank=True
+    )
+
+    price = models.ForeignKey(
+        'artworkprice',
+        verbose_name='Цена товара',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
     )
 
     class Meta:
