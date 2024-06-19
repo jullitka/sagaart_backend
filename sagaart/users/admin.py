@@ -1,13 +1,49 @@
+from typing import Any
 from django.contrib import admin
 from django.contrib.auth import get_user_model
+from django import forms
+from django.utils.translation import gettext_lazy as _
+
 from users.models import Subscribe, UserSubscribe
 
 
 User = get_user_model()
 
 
+class MainUserCreationForm(forms.ModelForm):
+    password = forms.CharField(
+        label=_("Password"),
+        strip=False,
+        widget=forms.PasswordInput(attrs={'autocomplete':'new_password'}),
+        help_text=_('Введите пароль')
+    )
+
+    class Meta:
+        model = User
+        fields = (
+            'name',
+            'surname',
+            'email',
+            'phone_number',
+            'status',
+            'subscription',
+            'approval',
+            'is_staff'
+        )
+
+    def save(self, commit: bool = True) -> Any:
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data['password'])
+        if commit:
+            user.save()
+            if hasattr(self, "save_m2m"):
+                self.save_m2m()
+        return user
+
+
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
+class MainUserAdmin(admin.ModelAdmin):
+    form = MainUserCreationForm
     list_display = (
         'name',
         'surname',
