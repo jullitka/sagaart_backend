@@ -9,6 +9,7 @@ User = get_user_model()
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
+    '''Сериализатор создание пользователя'''
     password = serializers.CharField(write_only=True)
     phone_number = serializers.RegexField(
         regex=r'^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$',
@@ -27,6 +28,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
 
 class UserRetriveSerializer(serializers.ModelSerializer):
+    '''Сериализатор карточки юзера'''
     class Meta:
         model = User
         fields = [
@@ -105,6 +107,7 @@ class ArtObjectSerializer(ArtListSerializer):
 
 
 class AuthorSerializer(serializers.ModelSerializer):
+    '''Сериализатор автора произведения'''
     class Meta:
         model = ArtistModel
         fields = ('id', 'name',)

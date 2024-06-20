@@ -33,6 +33,7 @@ class TestViewSet(viewsets.ModelViewSet):
 
 
 class MainUserViewSet(UserViewSet):
+    '''Представление функционала пользователя'''
     def get_permissions(self):
         if self.action == 'me':
             self.permission_classes = settings.PERMISSIONS.me
