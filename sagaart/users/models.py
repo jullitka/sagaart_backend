@@ -17,29 +17,31 @@ class PermUser:
 
 
 class Subscribe(models.Model):
-    price = models.IntegerField('Cтоиvость подписки')
-    sub_time = models.CharField('Срок подписки', max_length=40) # | models.DurationField()
+    price = models.IntegerField('Cтоимость подписки')
+    sub_time = models.IntegerField('Срок подписки') # | models.DurationField()
 
     def __str__(self):
-        return (f'Длительность {self.sub_time[:40]} Стоимость {self.price}')
+        return (f'Длительность {self.sub_time} Стоимость {self.price}')
 
     class Meta:
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
         ordering = ['-sub_time']
 
-# TODO
+
 class UserSubscribe(models.Model):
     user_id = models.ForeignKey(
         'User',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='user_sub'
     )
     subscribe = models.ForeignKey(
         Subscribe,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='user_sub'
     )
     time_off = models.DateField(
-        blank=True
+        blank=True,
     )
 
     class Meta:
@@ -109,7 +111,7 @@ class User(AbstractBaseUser, PermUser):
 
     def __str__(self):
         return f'mail={self.email}, name={self.name}, status={self.status}'
-    
+
     class Meta:
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
