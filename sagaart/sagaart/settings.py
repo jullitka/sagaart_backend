@@ -15,7 +15,6 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -40,12 +39,9 @@ ALLOWED_HOSTS = ['db', '*']
 # Application definition
 
 INSTALLED_APPS = [
-    'users.apps.UsersConfig',
     'artworks.apps.ArtworksConfig',
-    'api.apps.ApiConfig',
     'artists.apps.ArtistsConfig',
     'market.apps.MarketConfig',
-
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -53,12 +49,20 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'djoser',
-    'drf_spectacular',
+    'api',
+    'users',
+    'django_filters',
     'rest_framework',
+    'drf_spectacular',
     'rest_framework.authtoken'
 ]
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+}
+    
 
 AUTH_USER_MODEL = 'users.User'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

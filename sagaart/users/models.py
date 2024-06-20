@@ -1,12 +1,17 @@
-from django.db import models
+from datetime import datetime, timedelta
+
+import jwt
 from django.contrib.auth.models import AbstractBaseUser
+from django.db import models
+
 from users.manager import CustomUserManager
+
 
 class PermUser:
 
     def has_perm(self, perm, obj=None):
         return self.is_staff
-    
+
     def has_module_perms(self, app_label):
        return self.is_staff
 
@@ -45,12 +50,14 @@ class UserSubscribe(models.Model):
 
 
 class User(AbstractBaseUser, PermUser):
+    '''Кастомная модель юзеров, username_field заменен на email'''
 
     class UserStatus(models.TextChoices):
-        USER = 'user'
-        ARTIST = 'artist'
-        IN_SERVICE = 'in_service'
-
+        USER = 'Покупатель'
+        ADMIN = 'Администратор'
+        MODER = 'Модератор'
+        SALER_COLLECT = 'Продавец коллекционер'
+        SALER_ARTIST = 'Продавец художник'
 
     name = models.CharField(
         'Имя',

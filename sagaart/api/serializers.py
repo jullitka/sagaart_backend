@@ -1,14 +1,15 @@
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from django.contrib.auth import get_user_model
-
-from users.models import UserSubscribe, Subscribe
+from artworks.models import ArtistModel, ArtworkModel
+from users.models import Subscribe, UserSubscribe
 
 
 User = get_user_model()
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
+    '''Сериализатор создание пользователя'''
     password = serializers.CharField(write_only=True)
     phone_number = serializers.RegexField(
         regex=r'^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$',
@@ -25,6 +26,21 @@ class UserCreateSerializer(serializers.ModelSerializer):
             'phone_number'
         ]
 
+
+class UserRetriveSerializer(serializers.ModelSerializer):
+    '''Сериализатор карточки юзера'''
+    class Meta:
+        model = User
+        fields = [
+            'id',
+            'email',
+            'name',
+            'surname',
+            'phone_number',
+            'status',
+            'subscription'
+        ]
+
     def create(self, validated_data):
         user = User(**validated_data)
         user.set_password(validated_data['password'])
@@ -37,20 +53,6 @@ class UserCreateSerializer(serializers.ModelSerializer):
                 {'ERROR': 'phone number exists'}
             )
         return phone_number
-
-
-class UserRetriveSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = [
-            'id',
-            'email',
-            'name',
-            'surname',
-            'phone_number',
-            'status',
-            'subscription'
-        ]
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
@@ -72,3 +74,40 @@ class SubscribeUserSerializer(serializers.ModelSerializer):
             'sub_time',
             'time_off'
         ]
+
+
+FIELDS_FOR_ART_OBJECTS = (
+    'title', 'artist', 'description', 'imageUrl',
+    'size', 'orientation', 'brushstrokes_material',
+    'style', 'decoration', 'price', 'year',
+    'series', 'author_signature', 'email',
+)
+
+
+class ArtListSerializer(serializers.ModelSerializer):
+    '''Сериализатор для каталога арт-объектов'''
+    title = serializers.CharField(source='name')
+    artist = serializers.CharField(source='author')
+    year = serializers.CharField(write_only=True)
+    email = serializers.EmailField(source='user.email', write_only=True)
+    description = serializers.CharField()
+    imageUrl = serializers.CharField(source='image')
+
+    class Meta:
+        model = ArtworkModel
+        fields = FIELDS_FOR_ART_OBJECTS
+        extra_kwargs = {
+            'price': {'read_only': True},
+        }
+
+
+class ArtObjectSerializer(ArtListSerializer):
+    '''Сериализатор для карточки товара'''
+    pass
+
+
+class AuthorSerializer(serializers.ModelSerializer):
+    '''Сериализатор автора произведения'''
+    class Meta:
+        model = ArtistModel
+        fields = ('id', 'name',)

@@ -1,5 +1,7 @@
 from django.db import models
 
+from users.models import User
+
 from .constants import ORIENTATION_CHOICES, SALE_STATUS_CHOICES
 
 from artists.models import ArtistModel, SeriesModel
@@ -130,6 +132,18 @@ class ArtworkModel(models.Model):
     )
     image = models.ImageField(
         verbose_name='Фото работы'
+    )
+    description = models.TextField(
+        verbose_name='Описание картины',
+        null=True, blank=True
+    )
+
+    price = models.ForeignKey(
+        'artworkprice',
+        verbose_name='Цена товара',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
     )
 
     class Meta:
