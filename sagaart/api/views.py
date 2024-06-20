@@ -13,7 +13,7 @@ from api.messages import SUBSCRIPTIONS
 from api.permissions import (IsAdminOrRead, IsOwnerProfile)
 from api.serializers import (ArtListSerializer, ArtObjectSerializer,
                              SubscribeSerializer, SubscribeUserSerializer)
-from artworks.models import ArtistModel, ArtworkModel, ArtworkPrice
+from artworks.models import ArtistModel, ArtworkModel, ArtworkPriceModel
 from users.models import Subscribe, UserSubscribe
 
 SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
@@ -86,7 +86,8 @@ class PaintingsAPIView(generics.ListCreateAPIView):
             author_signature=data['author_signature'],
             series_id=data['series']
         )
-        price = ArtworkPrice.objects.filter(artwork=art)
+        price = ArtworkPriceModel.objects.filter(artwork=art)
+        art.price=price
         return Response(
             data=(request.data, price,),
             status=status.HTTP_201_CREATED

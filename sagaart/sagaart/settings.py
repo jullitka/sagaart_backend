@@ -39,10 +39,8 @@ ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='127.0.0.1, localhost').split
 
 INSTALLED_APPS = [
     'artworks.apps.ArtworksConfig',
-    'api.apps.ApiConfig',
     'artists.apps.ArtistsConfig',
     'market.apps.MarketConfig',
-
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -53,7 +51,7 @@ INSTALLED_APPS = [
     'api',
     'users',
     'django_filters',
-    'rest_framework'
+    'rest_framework',
     'drf_spectacular',
     'rest_framework.authtoken'
 ]
