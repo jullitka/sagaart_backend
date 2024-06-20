@@ -60,8 +60,8 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/sagaart_backend
-            docker compose stop
-            docker compose rm backend
+            sudo docker compose stop
+            sudo docker compose rm backend
             echo DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }} > .env
             echo POSTGRES_ENGINE=${{ secrets.DB_ENGINE }} > .env
             echo POSTGRES_DB=${{ secrets.POSTGRES_DB }} >> .env
@@ -73,5 +73,5 @@ jobs:
             echo DJANGO_SUPERUSER_EMAIL=${{ secrets.DJANGO_SUPERUSER_EMAIL }} >> .env
             echo DJANGO_SUPERUSER_USERNAME=${{ secrets.DJANGO_SUPERUSER_USERNAME }} >> .env
             #echo REACT_APP_API_KEY=${{ secrets.REACT_APP_API_KEY }} >> .env
-            docker compose up -d --build
+            sudo docker compose up -d --build
             sudo docker image prune --force
