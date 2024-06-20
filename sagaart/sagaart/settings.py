@@ -33,7 +33,8 @@ SECRET_KEY = 'django-insecure-osf+vwjtn9_gimz_m6wjzx%7hhu#1xps$7bq*td^d%_c3&og6&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True # os.getenv('DEBUG') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='127.0.0.1, localhost').split(',')
+# ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='127.0.0.1, localhost').split(',')
+ALLOWED_HOSTS = ['db', '*']
 
 
 # Application definition
@@ -99,7 +100,7 @@ DATABASES = {
         'NAME': os.getenv("POSTGRES_DB", default="postgres"),
         'USER': os.getenv("POSTGRES_USER", default="postgres"),
         'PASSWORD': os.getenv("POSTGRES_PASSWORD", default="postgres"),
-        'HOST': os.getenv("POSTGRES_HOST", default="localhost"),
+        'HOST': os.getenv("POSTGRES_HOST", default="db"),
         'PORT': os.getenv("POSTGRES_PORT", default=5432),
     }
 }
@@ -138,7 +139,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static-back')
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media-back')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
