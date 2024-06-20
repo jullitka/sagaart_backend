@@ -50,6 +50,7 @@ class UserSubscribe(models.Model):
 
 
 class User(AbstractBaseUser, PermUser):
+    '''Кастомная модель юзеров, username_field заменен на email'''
 
     class UserStatus(models.TextChoices):
         USER = 'Покупатель'

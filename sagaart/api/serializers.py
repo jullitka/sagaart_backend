@@ -39,7 +39,6 @@ class UserRetriveSerializer(serializers.ModelSerializer):
             'subscription'
         ]
 
-
     def create(self, validated_data):
         user = User(**validated_data)
         user.set_password(validated_data['password'])
@@ -75,7 +74,7 @@ class SubscribeUserSerializer(serializers.ModelSerializer):
         ]
 
 
-fields_for_art_objects = (
+FIELDS_FOR_ART_OBJECTS = (
     'title', 'artist', 'description', 'imageUrl',
     'size', 'orientation', 'brushstrokes_material',
     'style', 'decoration', 'price', 'year',
@@ -84,6 +83,7 @@ fields_for_art_objects = (
 
 
 class ArtListSerializer(serializers.ModelSerializer):
+    '''Сериализатор для каталога арт-объектов'''
     title = serializers.CharField(source='name')
     artist = serializers.CharField(source='author')
     year = serializers.CharField(write_only=True)
@@ -93,13 +93,14 @@ class ArtListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ArtworkModel
-        fields = fields_for_art_objects
+        fields = FIELDS_FOR_ART_OBJECTS
         extra_kwargs = {
             'price': {'read_only': True},
         }
 
 
 class ArtObjectSerializer(ArtListSerializer):
+    '''Сериализатор для карточки товара'''
     pass
 
 

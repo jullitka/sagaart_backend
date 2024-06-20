@@ -2,6 +2,7 @@ from django.contrib.auth.models import BaseUserManager
 
 
 class CustomUserManager(BaseUserManager):
+    '''Кастомный менеджер для User'''
 
     def create_superuser(self, email, name, surname, phone_number, password):
         user = self.create_user(email, name, surname, phone_number, password)

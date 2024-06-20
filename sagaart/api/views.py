@@ -56,6 +56,7 @@ class MainUserViewSet(UserViewSet):
 
 
 class PaintingsAPIView(generics.ListCreateAPIView):
+    '''Представление для списка и создания арт-объекта'''
     queryset = ArtworkModel.objects.all()
     serializer_class = ArtListSerializer
     pagination_class = LimitOffsetPagination
@@ -87,7 +88,7 @@ class PaintingsAPIView(generics.ListCreateAPIView):
             series_id=data['series']
         )
         price = ArtworkPriceModel.objects.filter(artwork=art)
-        art.price=price
+        art.price = price
         return Response(
             data=(request.data, price,),
             status=status.HTTP_201_CREATED
@@ -95,6 +96,7 @@ class PaintingsAPIView(generics.ListCreateAPIView):
 
 
 class RetrieveArtObject(generics.RetrieveAPIView):
+    '''Представление для карточки арт-объекта'''
     queryset = ArtworkModel.objects.all()
     serializer_class = ArtObjectSerializer
     permission_classes = (IsAuthenticated,)
