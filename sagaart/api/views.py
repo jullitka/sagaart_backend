@@ -10,10 +10,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from api.messages import SUBSCRIPTIONS
-from api.permissions import (IsAdminOrRead, IsOwnerProfile)
+from api.permissions import IsAdminOrRead, IsOwnerProfile
 from api.serializers import (ArtListSerializer, ArtObjectSerializer,
                              SubscribeSerializer, SubscribeUserSerializer)
-from artworks.models import ArtistModel, ArtworkModel, ArtworkPriceModel
+from api.utils import get_object_by_filter
+from artists.models import SeriesModel
+from artworks.models import (ArtistModel, ArtworkModel, ArtworkPriceModel,
+                             StyleModel)
 from users.models import Subscribe, UserSubscribe
 
 SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
@@ -69,27 +72,36 @@ class PaintingsAPIView(generics.ListCreateAPIView):
     search_fields = ('name',)
 
     def post(self, request, *args, **kwargs):
-        author, create = ArtistModel.objects.get_or_create(
-            name=request.data['artist']
-        )
         data = request.data
-        art = ArtworkModel.objects.create(
-            name=data['title'],
-            author=author,
-            description=data['description'],
-            image=data['imageUrl'],
-            user_id=request.user.id,
-            year=data['year'],
-            size=data['size'],
-            brushstrokes_material=data['brushstrokes_material'],
-            orientation=data['orientation'],
-            style=data['style'],
-            decoration=data['decoration'],
-            author_signature=data['author_signature'],
-            series_id=data['series']
-        )
-        price = ArtworkPriceModel.objects.filter(artwork=art)
-        art.price = price
+        try:
+            author, create = ArtistModel.objects.get_or_create(
+                name=data['artist']
+            )
+            style = get_object_by_filter(
+                StyleModel, 'name', data['style']
+            )
+            series = get_object_by_filter(
+                SeriesModel, 'name', data['series']
+            )
+            art = ArtworkModel.objects.create(
+                name=data['title'],
+                author=author,
+                description=data['description'],
+                image=data['imageUrl'],
+                user_id=request.user.id,
+                year=data['year'],
+                size=data['size'],
+                brushstrokes_material=data['brushstrokes_material'],
+                orientation=data['orientation'],
+                style=style,
+                decoration=data['decoration'],
+                author_signature=data['author_signature'],
+                series=series
+            )
+            price = ArtworkPriceModel.objects.filter(artwork=art)
+            art.price = price
+        except Exception as er:
+            return Response({'Ошибка': f' Нет поля {er}'})
         return Response(
             data=(request.data, price,),
             status=status.HTTP_201_CREATED

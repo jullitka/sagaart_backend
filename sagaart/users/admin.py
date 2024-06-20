@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
-from users.models import Subscribe, UserSubscribe
 
 from users import models
+from users.models import Subscribe, UserSubscribe
 
 User = get_user_model()
 

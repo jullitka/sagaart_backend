@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import (OrderModel, PurchaseModel, ShoppingCartModel)
+from .models import OrderModel, PurchaseModel, ShoppingCartModel
 
 
 @admin.register(OrderModel)
