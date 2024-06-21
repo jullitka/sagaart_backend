@@ -137,15 +137,7 @@ class ArtworkModel(models.Model):
         verbose_name='Описание картины',
         null=True, blank=True
     )
-
-    price = models.ForeignKey(
-        'artworkprice',
-        verbose_name='Цена товара',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
-
+    
     class Meta:
         verbose_name = 'Произведение искусства'
         verbose_name_plural = 'Произведения искусства'
