@@ -138,13 +138,13 @@ class ArtworkModel(models.Model):
         null=True, blank=True
     )
 
-    price = models.ForeignKey(
-        'artworkprice',
-        verbose_name='Цена товара',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
-    )
+    #price = models.ForeignKey(
+    #    'artworkprice',
+    #    verbose_name='Цена товара',
+    #    on_delete=models.SET_NULL,
+    #    null=True,
+    #    blank=True
+    #)
 
     class Meta:
         verbose_name = 'Произведение искусства'
