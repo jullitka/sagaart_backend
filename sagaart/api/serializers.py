@@ -70,7 +70,7 @@ class SubscribeUserSerializer(serializers.ModelSerializer):
         model = UserSubscribe
         fields = [
             'email',
-            'price',
+            # 'price',
             'sub_time',
             'time_off'
         ]
@@ -96,9 +96,9 @@ class ArtListSerializer(serializers.ModelSerializer):
     class Meta:
         model = ArtworkModel
         fields = FIELDS_FOR_ART_OBJECTS
-        extra_kwargs = {
-            'price': {'read_only': True},
-        }
+        # extra_kwargs = {
+        #    'price': {'read_only': True},
+        # }
 
 
 class ArtObjectSerializer(ArtListSerializer):
