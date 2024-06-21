@@ -4,7 +4,6 @@ from rest_framework import serializers
 from artworks.models import ArtistModel, ArtworkModel
 from users.models import Subscribe, UserSubscribe
 
-
 User = get_user_model()
 
 
@@ -79,7 +78,7 @@ class SubscribeUserSerializer(serializers.ModelSerializer):
 FIELDS_FOR_ART_OBJECTS = (
     'title', 'artist', 'description', 'imageUrl',
     'size', 'orientation', 'brushstrokes_material',
-    'style', 'decoration', 'price', 'year',
+    'style', 'decoration', 'year',
     'series', 'author_signature', 'email',
 )
 
@@ -91,6 +90,7 @@ class ArtListSerializer(serializers.ModelSerializer):
     year = serializers.CharField(write_only=True)
     email = serializers.EmailField(source='user.email', write_only=True)
     description = serializers.CharField()
+    series = serializers.CharField()
     imageUrl = serializers.CharField(source='image')
 
     class Meta:

@@ -5,7 +5,6 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from users.models import Subscribe, UserSubscribe
-
 from users import models
 
 User = get_user_model()

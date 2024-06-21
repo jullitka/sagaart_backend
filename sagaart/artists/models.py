@@ -37,11 +37,13 @@ class ArtistModel(models.Model):
     )
     about_artist = models.TextField(
         verbose_name='Об авторе',
-        null=False,
-        blank=False,
+        null=True,
+        blank=True,
     )
     photo = models.ImageField(
-        verbose_name='Фото автора'
+        verbose_name='Фото автора',
+        null=True,
+        blank=True,
     )
 
     class Meta:

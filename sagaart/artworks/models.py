@@ -1,9 +1,6 @@
 from django.db import models
 
-from users.models import User
-
 from .constants import ORIENTATION_CHOICES, SALE_STATUS_CHOICES
-
 from artists.models import ArtistModel, SeriesModel
 from users.models import User
 
@@ -29,8 +26,8 @@ class StyleModel(models.Model):
     """Модель стилей"""
     name = models.CharField(
         verbose_name='Стиль',
-        null=True,
-        blank=True,
+        null=False,
+        blank=False,
         max_length=100
     )
 
@@ -81,7 +78,8 @@ class ArtworkModel(models.Model):
         SeriesModel,
         verbose_name='Серия работ',
         on_delete=models.SET_NULL,
-        null=True
+        null=True,
+        blank=True
     )
     is_estimate = models.BooleanField(
         verbose_name='Оценка получена',
@@ -137,7 +135,7 @@ class ArtworkModel(models.Model):
         verbose_name='Описание картины',
         null=True, blank=True
     )
-    
+
     class Meta:
         verbose_name = 'Произведение искусства'
         verbose_name_plural = 'Произведения искусства'
