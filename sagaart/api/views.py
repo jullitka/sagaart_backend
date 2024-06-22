@@ -18,13 +18,15 @@ from artists.models import SeriesModel
 from artworks.models import (ArtistModel, ArtworkModel, ArtworkPriceModel,
                              StyleModel)
 from users.models import Subscribe, UserSubscribe
+import datetime as dt
+
 
 SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
 PERMISSIONS_USER = ['me',]
 User = get_user_model()
 
 
-class SubscribeViewSet(viewsets.ModelViewSet):
+class SubscribeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Subscribe.objects.all()
     serializer_class = SubscribeSerializer
     permission_classes = [IsAdminOrRead, ]
@@ -38,11 +40,14 @@ class TestViewSet(viewsets.ModelViewSet):
 class MainUserViewSet(UserViewSet):
     '''Представление функционала пользователя'''
     def get_permissions(self):
-        if self.action == 'me':
+        if self.action in PERMISSIONS_USER:
             self.permission_classes = settings.PERMISSIONS.me
-        if self.action == 'subscribe':
-            self.permission_classes = IsOwnerProfile
         return super().get_permissions()
+
+    def get_serializer_class(self, *args, **kwargs):
+        if self.action == "subscribe" or self.action == "my_subscription":
+            return SubscribeUserSerializer
+        return super().get_serializer_class(*args, **kwargs)
 
     @action(['post', 'delete'], detail=True)
     def subscribe(self, request, sub_id, *args, **kwargs):
@@ -57,6 +62,41 @@ class MainUserViewSet(UserViewSet):
                     {'ERROR': SUBSCRIPTIONS['exists']},
                     status=status.HTTP_403_FORBIDDEN
                 )
+            days = subscription.sub_time
+            time_off = dt.datetime.now() + dt.timedelta(days)
+            UserSubscribe.objects.create(
+                user_id=user, subscribe=subscription, time_off=time_off
+            )
+            data_serializer = UserSubscribe.objects.get(user_id=user)
+            serializer = self.get_serializer(data_serializer)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        if request.method == "DELETE":
+            try:
+                user_sub = UserSubscribe.objects.get(
+                    user_id=user, subscribe=subscription
+                )
+            except Exception:
+                return Response(
+                    {"ERROR": SUBSCRIPTIONS["no_subscribe"]},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            user_sub.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        
+
+    @action(["get"], detail=True, permission_classes=[IsAuthenticated])
+    def my_subscription(self, request, *args, **kwargs):
+        user = request.user
+        try:
+            user_subscription = UserSubscribe.objects.get(user_id=user)
+        except Exception:
+            return Response(
+                {"ERROR": SUBSCRIPTIONS["no_subscribe"]},
+                status=status.HTTP_200_OK
+            )
+        serializer = self.get_serializer(user_subscription)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class PaintingsAPIView(generics.ListCreateAPIView):
