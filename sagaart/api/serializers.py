@@ -1,4 +1,7 @@
 from django.contrib.auth import get_user_model
+import django.contrib.auth.password_validation as validators
+from django.core import exceptions
+
 from rest_framework import serializers
 
 from artworks.models import ArtistModel, ArtworkModel
@@ -26,6 +29,27 @@ class UserCreateSerializer(serializers.ModelSerializer):
         ]
 
 
+    def create(self, validated_data):
+        user = User(**validated_data)
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
+
+    def validate_phone_number(self, phone_number):
+        if User.objects.filter(phone_number=phone_number).exists():
+            raise serializers.ValidationError(
+                {'ERROR': 'phone number exists'}
+            )
+        return phone_number
+
+    def validate_password(self, password):
+        try:
+            validators.validate_password(password=password)
+        except exceptions.ValidationError as e:
+            raise serializers.ValidationError(e.messages)
+        return password
+
+
 class UserRetriveSerializer(serializers.ModelSerializer):
     '''Сериализатор карточки юзера'''
     class Meta:
@@ -40,18 +64,6 @@ class UserRetriveSerializer(serializers.ModelSerializer):
             'subscription'
         ]
 
-    def create(self, validated_data):
-        user = User(**validated_data)
-        user.set_password(validated_data['password'])
-        user.save()
-        return user
-
-    def validate_phone_number(self, phone_number):
-        if User.objects.filter(phone_number=phone_number).exists():
-            raise serializers.ValidationError(
-                {'ERROR': 'phone number exists'}
-            )
-        return phone_number
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
