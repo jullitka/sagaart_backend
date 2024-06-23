@@ -37,9 +37,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'rest_framework.authtoken'
 ]
-REST_FRAMEWORK = {
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
-}
+
 
 AUTH_USER_MODEL = 'users.User'
 
@@ -84,7 +82,7 @@ DATABASES = {
         'NAME': os.getenv("POSTGRES_DB", default="postgres"),
         'USER': os.getenv("POSTGRES_USER", default="postgres"),
         'PASSWORD': os.getenv("POSTGRES_PASSWORD", default="postgres"),
-        'HOST': os.getenv("POSTGRES_HOST", default="db"),
+        'HOST': os.getenv("POSTGRES_HOST", default="localhost"),
         'PORT': os.getenv("POSTGRES_PORT", default=5432),
     }
 }
