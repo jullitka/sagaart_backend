@@ -146,7 +146,6 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
 
-from django.contrib.auth import password_validation
 #Djoser
 DJOSER = {
     'PERMISSIONS': {
