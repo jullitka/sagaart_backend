@@ -169,6 +169,7 @@ class ArtworkPriceModel(models.Model):
     )
 
     class Meta:
+        ordering = ('-pub_date',)
         verbose_name = 'Цена произведения искусства'
         verbose_name_plural = 'Цены произведений искусства'
 
