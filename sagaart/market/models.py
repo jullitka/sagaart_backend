@@ -120,6 +120,9 @@ class PurchaseModel(models.Model):
     class Meta:
         verbose_name = 'Покупка'
         verbose_name_plural = 'Покупки'
+        constraints = [
+            models.UniqueConstraint(fields=['artwork'], name='unique_artwork')
+        ]
 
     def __str__(self):
         return f'{self.artwork} из заказа {self.order}'

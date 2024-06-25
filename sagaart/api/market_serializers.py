@@ -39,6 +39,7 @@ class ArtworkToShoppingCartSerializer(serializers.ModelSerializer):
 class ShoppingCartSerializer(serializers.ModelSerializer):
     """Сериализатор для получения списка работ в корзине"""
     artwork = ArtworkToShoppingCartSerializer()
+
     price = serializers.SerializerMethodField()
 
     class Meta:
@@ -153,6 +154,8 @@ class DeliverySerializer(serializers.ModelSerializer):
         current_time = timezone.now()
         if not obj.in_delivery:
             return "Ожидает передачи в доставку"
+        elif not obj.delivery_date:
+            return "Нет информации о"
         elif obj.is_delivered:
             return "Доставлено"
         elif obj.delivery_date and obj.delivery_date < current_time:

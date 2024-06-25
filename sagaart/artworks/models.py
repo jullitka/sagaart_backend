@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 
 from .constants import ORIENTATION_CHOICES, SALE_STATUS_CHOICES
 from artists.models import ArtistModel, SeriesModel
@@ -55,7 +56,8 @@ class ArtworkModel(models.Model):
     user = models.ForeignKey(
         User,
         verbose_name='Продавец',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        null=False
     )
     year = models.IntegerField(
         verbose_name='Год создания',
@@ -142,6 +144,13 @@ class ArtworkModel(models.Model):
 
     def __str__(self):
         return f'{self.name}, {self.author}'
+    
+    def clean(self):
+        super().clean()
+        if not self.is_estimate and self.is_on_sold != 'not posted':
+            raise ValidationError(
+                {'is_on_sold': 'Нельзя выставить на продажу, если оценка не получена'}
+            )
 
 
 class ArtworkPriceModel(models.Model):

@@ -1,6 +1,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema_view
 from rest_framework import filters, mixins, viewsets
+from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -59,3 +60,25 @@ class DeliveryViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     def get_queryset(self):
         user = self.request.user
         return PurchaseModel.objects.filter(buyer=user)
+    
+    @action(detail=False,
+            permission_classes=(IsAuthenticated,))
+    def is_not_delivered(self, request):
+        """Получить список недоставленных покупок"""
+        user = self.request.user
+        delivered_purchases = PurchaseModel.objects.filter(
+            buyer=user, is_delivered=False
+        )
+        serializer = self.get_serializer(delivered_purchases, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False,
+            permission_classes=(IsAuthenticated,))
+    def is_delivered(self, request):
+        """Получить список доставленных покупок"""
+        user = self.request.user
+        delivered_purchases = PurchaseModel.objects.filter(
+            buyer=user, is_delivered=True
+        )
+        serializer = self.get_serializer(delivered_purchases, many=True)
+        return Response(serializer.data)
