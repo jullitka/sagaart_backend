@@ -73,11 +73,6 @@ class SubscribeViewSet(viewsets.ReadOnlyModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class TestViewSet(viewsets.ModelViewSet):
-    queryset = UserSubscribe.objects.all()
-    serializer_class = SubscribeUserSerializer
-
-
 class MainUserViewSet(UserViewSet):
     '''Представление функционала пользователя'''
     def get_permissions(self):
