@@ -124,6 +124,7 @@ class DeliverySerializer(serializers.ModelSerializer):
     """Сериализатор для получения списка доставляемых покупок"""
     artwork_name = serializers.SerializerMethodField()
     artwork_author = serializers.SerializerMethodField()
+    image = serializers.ImageField(source='artwork.image')
     delivery_type = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
 
@@ -133,6 +134,7 @@ class DeliverySerializer(serializers.ModelSerializer):
             'delivery_date',
             'artwork_name',
             'artwork_author',
+            'image',
             'delivery_type',
             'status',
             'delivery_date'
@@ -143,7 +145,7 @@ class DeliverySerializer(serializers.ModelSerializer):
 
     def get_artwork_author(self, obj):
         return obj.artwork.author.name
-
+    
     def get_delivery_type(self, obj):
         return obj.order.delivery_type
 
