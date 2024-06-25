@@ -1,17 +1,12 @@
-from django.contrib.auth import get_user_model
-import django.contrib.auth.password_validation as validators
-from django.core import exceptions
 from django.db import transaction
 from django.utils import timezone
 
 from rest_framework import serializers
 
 from .serializers import StyleSerializer
-from artworks.constants import SALE_STATUS_CHOICES
 from artworks.models import ArtistModel, ArtworkModel, ArtworkPriceModel
 from market.constants import DELIVERY_TYPE_CHOICES, PAYMENT_METHOD_CHOICES
 from market.models import OrderModel, PurchaseModel, ShoppingCartModel
-from users.models import Subscribe, UserSubscribe
 
 
 class ArtworkToShoppingCartAuthorSerializer(serializers.ModelSerializer):
@@ -52,7 +47,9 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
 
     def get_price(self, obj):
         artwork = obj.artwork
-        artwork_price = ArtworkPriceModel.objects.filter(artwork=artwork).first()
+        artwork_price = ArtworkPriceModel.objects.filter(
+            artwork=artwork
+        ).first()
         if obj.is_copy:
             return artwork_price.copy_price
         return artwork_price.original_price
@@ -81,7 +78,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
 
         # создание заказа
         with transaction.atomic():
-            order = OrderModel.objects.create( 
+            order = OrderModel.objects.create(
                 buyer=buyer,
                 address=validated_data['address'],
                 payment_method=validated_data['payment_method'],
@@ -103,17 +100,17 @@ class OrderCreateSerializer(serializers.ModelSerializer):
                 else:
                     total_cost += latest_price_to_artwork.original_price
 
-                artwork=artwork_info.artwork
+                artwork = artwork_info.artwork
                 # создание покупки для произведения из заказа
-                PurchaseModel.objects.create( 
+                PurchaseModel.objects.create(
                     artwork=artwork,
                     buyer=buyer,
                     order=order
                 )
 
-                artwork.is_on_sold = SALE_STATUS_CHOICES[2]
+                artwork.is_on_sold = 'sold'
                 artwork.save()
-          
+
             # добавление общей стоимотси заказа
             order.cost = total_cost
             order.save()
@@ -121,3 +118,42 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             # удаление работ из корзины
             shopping_cart.delete()
         return order
+
+
+class DeliverySerializer(serializers.ModelSerializer):
+    """Сериализатор для получения списка доставляемых покупок"""
+    artwork_name = serializers.SerializerMethodField()
+    artwork_author = serializers.SerializerMethodField()
+    delivery_type = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+
+    class Meta:
+        model = PurchaseModel
+        fields = (
+            'delivery_date',
+            'artwork_name',
+            'artwork_author',
+            'delivery_type',
+            'status',
+            'delivery_date'
+        )
+
+    def get_artwork_name(self, obj):
+        return obj.artwork.name
+
+    def get_artwork_author(self, obj):
+        return obj.artwork.author.name
+
+    def get_delivery_type(self, obj):
+        return obj.order.delivery_type
+
+    def get_status(self, obj):
+        current_time = timezone.now()
+        if not obj.in_delivery:
+            return "Ожидает передачи в доставку"
+        elif obj.is_delivered:
+            return "Доставлено"
+        elif obj.delivery_date and obj.delivery_date < current_time:
+            return "Задерживается"
+        else:
+            return "В пути"

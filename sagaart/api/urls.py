@@ -1,14 +1,17 @@
 from django.urls import include, path
 from rest_framework import routers
 
-from .market_views import OrdersViewSet, ShoppingCartViewSet
+from .market_views import DeliveryViewSet, OrdersViewSet, ShoppingCartViewSet
 from .views import PaintingsAPIView, RetrieveArtObject
 
 
 v1_router = routers.SimpleRouter()
 
-v1_router.register(r'shopping_cart', ShoppingCartViewSet, basename='shopping_cart')
+v1_router.register(
+    r'shopping_cart', ShoppingCartViewSet, basename='shopping_cart'
+)
 v1_router.register(r'orders', OrdersViewSet, basename='orders')
+v1_router.register(r'delivery', DeliveryViewSet, basename='delivery')
 
 urlpatterns = [
     path('', include(v1_router.urls)),

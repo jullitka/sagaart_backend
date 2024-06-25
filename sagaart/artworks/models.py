@@ -90,7 +90,7 @@ class ArtworkModel(models.Model):
         choices=SALE_STATUS_CHOICES,
         null=False,
         blank=False,
-        default='не размещено'
+        default='not posted'
     )
     # может быть пустым в случае, если произведение - не картина
     orientation = models.CharField(
