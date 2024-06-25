@@ -13,8 +13,4 @@ urlpatterns = [
      path('v1/', include(v1_router.urls)),
      path('auth/token/login/', TokenCreateView.as_view()),
      path('auth/token/logout/', TokenDestroyView.as_view()),
-     #path(
-     #    'v1/<int:sub_id>/subscribe/',
-     #    SubscribeViewSet.as_view({'post': 'subscribe', 'delete': 'subscribe'})
-     #),
 ]
