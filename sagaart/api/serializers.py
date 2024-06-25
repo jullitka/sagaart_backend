@@ -4,7 +4,7 @@ from django.core import exceptions
 
 from rest_framework import serializers
 
-from artworks.models import ArtistModel, ArtworkModel
+from artworks.models import ArtistModel, ArtworkModel, StyleModel
 from users.models import Subscribe, UserSubscribe
 
 User = get_user_model()
@@ -27,7 +27,6 @@ class UserCreateSerializer(serializers.ModelSerializer):
             'email',
             'phone_number'
         ]
-
 
     def create(self, validated_data):
         user = User(**validated_data)
@@ -63,7 +62,6 @@ class UserRetriveSerializer(serializers.ModelSerializer):
             'status',
             'subscription'
         ]
-
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
@@ -109,7 +107,7 @@ class ArtListSerializer(serializers.ModelSerializer):
         model = ArtworkModel
         fields = FIELDS_FOR_ART_OBJECTS
         extra_kwargs = {
-           'price': {'read_only': True},
+            'price': {'read_only': True},
         }
 
 
@@ -123,3 +121,10 @@ class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = ArtistModel
         fields = ('id', 'name',)
+
+
+class StyleSerializer(serializers.ModelSerializer):
+    """Сериализатор для стилей"""
+    class Meta:
+        model = StyleModel
+        fields = ('name',)
