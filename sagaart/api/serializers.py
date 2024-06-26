@@ -269,8 +269,11 @@ class StyleSerializer(serializers.ModelSerializer):
 class FavoriteSerializer(serializers.ModelSerializer):
     name = serializers.CharField(source='artist.name')
     about_artist = serializers.CharField(source='artist.about_artist')
-    imageUrl = serializers.CharField(source='artist.image')
+    imageUrl = serializers.CharField(source='artist.photo')
 
     class Meta:
         model = FavoriteArtistModel
-        fields = '__all__'
+        fields = (
+            'name',
+            'about_artist',
+            'imageUrl')

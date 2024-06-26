@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.conf import settings
 from djoser.views import UserViewSet
-from rest_framework import filters, generics, status, viewsets
+from rest_framework import filters, generics, status, viewsets, mixins
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
@@ -37,14 +37,21 @@ class SubscribeViewSet(viewsets.ReadOnlyModelViewSet):
             return SubscribeUserSerializer
         return super().get_serializer_class(*args, **kwargs)
 
-    @action(['post', 'delete'], detail=True,
-            permission_classes=[IsOwnerProfile,])
-    def subscribe(self, request, pk, *args, **kwargs):
+    def get_permissions(self):
+        if self.action == "subscribe":
+            permission_classes = [IsAuthenticated, ]
+        return [permission() for permission in permission_classes]
+
+    @action(['post', 'delete'], detail=True)
+    def subscribe(self, request, *args, **kwargs):
         user = request.user
-        subscription = get_object_or_404(
-            Subscribe,
-            pk=pk
-        )
+        try:
+            subscription = self.get_object()
+        except Exception:
+            return Response(
+                {'ERROR': SUBSCRIPTIONS['no_subscribe']},
+                status=status.HTTP_400_BAD_REQUEST)
+
         if request.method == 'POST':
             if UserSubscribe.objects.filter(user_id=user).exists():
                 return Response(
@@ -156,40 +163,47 @@ class RetrieveArtObject(generics.RetrieveAPIView):
     permission_classes = (IsAuthenticated,)
 
 
-class FavoriteArtistsViewSet(viewsets.ReadOnlyModelViewSet):
+class FavoriteArtistsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = FavoriteArtistModel.objects.all()
     serializer_class = FavoriteSerializer
-    permission_classes = [IsOwnerProfile, ]
+    permission_classes = [IsAuthenticated, ]
 
     def get_queryset(self):
-        user = self.request.user
-        return FavoriteArtistModel.objects.filter(user=user)
-    
+        if self.action == "add_favorite":
+            return ArtistModel.objects.all()
+        return FavoriteArtistModel.objects.filter(user=self.request.user)
+
     @action(['post', 'delete'], detail=True)
-    def add_favorite(self, request, pk, *args, **kwargs):
+    def add_favorite(self, request, *args, **kwargs):
         user = request.user
         try:
-            fav_artist = ArtistModel.objects.get(pk=pk)
+            artist = self.get_object()
         except Exception:
             return Response(
                 {'ERROR': ARTISTS['no_artist']},
                 status=status.HTTP_400_BAD_REQUEST)
-        
-        if fav_artist.user == user:
-            return Response(
-                {'ERROR': ARTISTS['self_favorite']},
-                status=status.HTTP_403_FORBIDDEN
+        user_artist = FavoriteArtistModel.objects.filter(
+                user=user, artist=artist
             )
         if request.method == 'DELETE':
-            try:
-                user_artist = FavoriteArtistModel.objects.get(
-                    user=user,
-                    artist=fav_artist
-                )
-            except Exception:
+            if not user_artist.exists():
                 return Response(
-                    {'ERROR': ARTISTS['no_artist']}
+                    {'ERROR': ARTISTS['no_artist']},
+                    status=status.HTTP_400_BAD_REQUEST
                 )
             user_artist.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        
+        if user_artist.exists():
+            return Response(
+                {'ERROR': ARTISTS['yes_artist']},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        FavoriteArtistModel.objects.create(user=user, artist=artist)
+        serializer = self.get_serializer(
+            FavoriteArtistModel.objects.get(
+                user=user,
+                artist=artist
+            )
+        )
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED)
