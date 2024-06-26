@@ -4,5 +4,5 @@ DELIVERY_TYPE_CHOICES = (
 )
 PAYMENT_METHOD_CHOICES = (
     ('online', 'онлайн'),
-    ('on_receiving', 'приполучении'),
+    ('on_receiving', 'при получении'),
 )
