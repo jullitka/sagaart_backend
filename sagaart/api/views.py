@@ -3,13 +3,18 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.conf import settings
 from djoser.views import UserViewSet
+
 from rest_framework import filters, generics, status, viewsets, mixins
+from drf_spectacular.utils import extend_schema_view
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from api.messages import SUBSCRIPTIONS, ARTISTS
+from api.constants import (SUBSCRIPTION_API_SCHEMA_EXTENSIONS,
+                           USER_API_SCHEMA_EXTENSIONS)
+
 from api.permissions import IsAdminOrRead, IsOwnerProfile
 from api.serializers import (ArtListSerializer, ArtObjectSerializer,
                              SubscribeSerializer, SubscribeUserSerializer,
@@ -26,7 +31,7 @@ SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
 PERMISSIONS_USER = ['me', 'subscribe', 'my_subscription']
 User = get_user_model()
 
-
+@extend_schema_view(**SUBSCRIPTION_API_SCHEMA_EXTENSIONS)
 class SubscribeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Subscribe.objects.all()
     serializer_class = SubscribeSerializer
@@ -81,6 +86,7 @@ class SubscribeViewSet(viewsets.ReadOnlyModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@extend_schema_view(**USER_API_SCHEMA_EXTENSIONS)
 class MainUserViewSet(UserViewSet):
     '''Представление функционала пользователя'''
     def get_permissions(self):
