@@ -9,12 +9,13 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from api.messages import SUBSCRIPTIONS
+from api.messages import SUBSCRIPTIONS, ARTISTS
 from api.permissions import IsAdminOrRead, IsOwnerProfile
 from api.serializers import (ArtListSerializer, ArtObjectSerializer,
-                             SubscribeSerializer, SubscribeUserSerializer)
+                             SubscribeSerializer, SubscribeUserSerializer,
+                             FavoriteSerializer)
 from api.utils import get_object_by_filter
-from artists.models import SeriesModel
+from artists.models import SeriesModel, FavoriteArtistModel
 from artworks.models import (ArtistModel, ArtworkModel, ArtworkPriceModel,
                              StyleModel)
 from users.models import Subscribe, UserSubscribe
@@ -153,3 +154,42 @@ class RetrieveArtObject(generics.RetrieveAPIView):
     queryset = ArtworkModel.objects.all()
     serializer_class = ArtObjectSerializer
     permission_classes = (IsAuthenticated,)
+
+
+class FavoriteArtistsViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = FavoriteArtistModel.objects.all()
+    serializer_class = FavoriteSerializer
+    permission_classes = [IsOwnerProfile, ]
+
+    def get_queryset(self):
+        user = self.request.user
+        return FavoriteArtistModel.objects.filter(user=user)
+    
+    @action(['post', 'delete'], detail=True)
+    def add_favorite(self, request, pk, *args, **kwargs):
+        user = request.user
+        try:
+            fav_artist = ArtistModel.objects.get(pk=pk)
+        except Exception:
+            return Response(
+                {'ERROR': ARTISTS['no_artist']},
+                status=status.HTTP_400_BAD_REQUEST)
+        
+        if fav_artist.user == user:
+            return Response(
+                {'ERROR': ARTISTS['self_favorite']},
+                status=status.HTTP_403_FORBIDDEN
+            )
+        if request.method == 'DELETE':
+            try:
+                user_artist = FavoriteArtistModel.objects.get(
+                    user=user,
+                    artist=fav_artist
+                )
+            except Exception:
+                return Response(
+                    {'ERROR': ARTISTS['no_artist']}
+                )
+            user_artist.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        

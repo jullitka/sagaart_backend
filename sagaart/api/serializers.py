@@ -6,6 +6,7 @@ from rest_framework import serializers
 
 from artworks.models import ArtistModel, ArtworkModel
 from users.models import Subscribe, UserSubscribe
+from artists.models import FavoriteArtistModel
 
 User = get_user_model()
 
@@ -123,3 +124,13 @@ class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = ArtistModel
         fields = ('id', 'name',)
+
+
+class FavoriteSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(source='artist.name')
+    about_artist = serializers.CharField(source='artist.about_artist')
+    imageUrl = serializers.CharField(source='artist.image')
+
+    class Meta:
+        model = FavoriteArtistModel
+        fields = '__all__'
