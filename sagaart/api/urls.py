@@ -1,16 +1,16 @@
 from django.urls import include, path
 from rest_framework import routers
 
-from api.views import PaintingsAPIView, RetrieveArtObject
+from api.views import FavoriteArt, PaintingsAPIView, RetrieveArtObject
 
 v1_router = routers.DefaultRouter()
 
 
 urlpatterns = [
     path(
-        'paintings', PaintingsAPIView.as_view(), name='paintings'
+        'artworks/', PaintingsAPIView.as_view(), name='paintings'
     ),
-    path('paintings/<int:pk>', RetrieveArtObject.as_view()),
-    # path('paintings/<int:pk>/'),
+    path('artworks/<int:pk>', RetrieveArtObject.as_view()),
+    path('artworks/favorite/', FavoriteArt.as_view({'get': 'get_list'})),
     path('v1', include(v1_router.urls)),
 ]
