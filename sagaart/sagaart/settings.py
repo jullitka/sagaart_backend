@@ -1,4 +1,5 @@
 import os
+from distutils.util import strtobool
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -10,11 +11,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', default='token')
 
-DEBUG = (os.getenv("DEBUG", "False"))
+DEBUG = strtobool(os.getenv("DEBUG", "False"))
 
-ALLOWED_HOSTS = os.getenv(
-    'ALLOWED_HOSTS', default='127.0.0.1,localhost'
-).split(',')
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='127.0.0.1,localhost').split(',')
 
 # ALLOWED_HOSTS = ['db', '*']
 
@@ -84,7 +83,6 @@ DATABASES = {
         'PASSWORD': os.getenv("POSTGRES_PASSWORD", default="postgres"),
         'HOST': os.getenv("POSTGRES_HOST", default="db"),
         'PORT': os.getenv("POSTGRES_PORT", default=5432),
-        'TEST': {'NAME': 'test_database'},
     }
 }
 

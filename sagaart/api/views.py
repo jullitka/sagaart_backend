@@ -8,19 +8,24 @@ from django_filters.rest_framework import DjangoFilterBackend
 from djoser.conf import settings
 from djoser.views import UserViewSet
 
-from rest_framework import filters, generics, status, viewsets
+
+from rest_framework import filters, generics, status, viewsets, mixins
+from drf_spectacular.utils import extend_schema_view
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from api.messages import SUBSCRIPTIONS
+from api.messages import SUBSCRIPTIONS, ARTISTS
+from api.constants import (SUBSCRIPTION_API_SCHEMA_EXTENSIONS,
+                           USER_API_SCHEMA_EXTENSIONS)
+
 from api.permissions import IsAdminOrRead, IsOwnerProfile
 from api.serializers import (ArtListSerializer, ArtObjectSerializer,
-                             FavoriteArtworkSerializer, SubscribeSerializer,
-                             SubscribeUserSerializer)
+                             SubscribeSerializer, SubscribeUserSerializer,
+                             FavoriteSerializer, FavoriteArtworkSerializer)
 from api.utils import get_object_by_filter
-from artists.models import SeriesModel
+from artists.models import SeriesModel, FavoriteArtistModel
 from artworks.models import (ArtistModel, ArtworkModel, ArtworkPriceModel,
                              FavoriteArtworkModel, StyleModel)
 from users.models import Subscribe, UserSubscribe
@@ -31,25 +36,32 @@ SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
 PERMISSIONS_USER = ['me', 'subscribe', 'my_subscription']
 User = get_user_model()
 
-
+@extend_schema_view(**SUBSCRIPTION_API_SCHEMA_EXTENSIONS)
 class SubscribeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Subscribe.objects.all()
     serializer_class = SubscribeSerializer
-    permission_classes = [IsAdminOrRead, ]
 
     def get_serializer_class(self, *args, **kwargs):
         if self.action == "subscribe":
             return SubscribeUserSerializer
         return super().get_serializer_class(*args, **kwargs)
 
-    @action(['post', 'delete'], detail=True,
-            permission_classes=[IsOwnerProfile,])
-    def subscribe(self, request, pk, *args, **kwargs):
+    def get_permissions(self):
+        permission_classes = [IsAdminOrRead,]
+        if self.action == "subscribe":
+            permission_classes = [IsAuthenticated, ]
+        return [permission() for permission in permission_classes]
+
+    @action(['post', 'delete'], detail=True)
+    def subscribe(self, request, *args, **kwargs):
         user = request.user
-        subscription = get_object_or_404(
-            Subscribe,
-            pk=pk
-        )
+        try:
+            subscription = self.get_object()
+        except Exception:
+            return Response(
+                {'ERROR': SUBSCRIPTIONS['no_subscribe']},
+                status=status.HTTP_400_BAD_REQUEST)
+
         if request.method == 'POST':
             if UserSubscribe.objects.filter(user_id=user).exists():
                 return Response(
@@ -79,6 +91,7 @@ class SubscribeViewSet(viewsets.ReadOnlyModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+@extend_schema_view(**USER_API_SCHEMA_EXTENSIONS)
 class MainUserViewSet(UserViewSet):
     '''Представление функционала пользователя'''
     def get_permissions(self):
@@ -221,3 +234,48 @@ class NewsViewSet(generics.ListAPIView):
     queryset = NewsModel.objects.filter(is_active=True).order_by('-date_pub')
     serializer_class = NewsSerializer
 
+    
+class FavoriteArtistsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = FavoriteArtistModel.objects.all()
+    serializer_class = FavoriteSerializer
+    permission_classes = [IsAuthenticated, ]
+
+    def get_queryset(self):
+        if self.action == "add_favorite":
+            return ArtistModel.objects.all()
+        return FavoriteArtistModel.objects.filter(user=self.request.user)
+
+    @action(['post', 'delete'], detail=True)
+    def add_favorite(self, request, *args, **kwargs):
+        user = request.user
+        try:
+            artist = self.get_object()
+        except Exception:
+            return Response(
+                {'ERROR': ARTISTS['no_artist']},
+                status=status.HTTP_400_BAD_REQUEST)
+        user_artist = FavoriteArtistModel.objects.filter(
+                user=user, artist=artist
+            )
+        if request.method == 'DELETE':
+            if not user_artist.exists():
+                return Response(
+                    {'ERROR': ARTISTS['no_artist']},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            user_artist.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        if user_artist.exists():
+            return Response(
+                {'ERROR': ARTISTS['yes_artist']},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        FavoriteArtistModel.objects.create(user=user, artist=artist)
+        serializer = self.get_serializer(
+            FavoriteArtistModel.objects.get(
+                user=user,
+                artist=artist
+            )
+        )
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED)
