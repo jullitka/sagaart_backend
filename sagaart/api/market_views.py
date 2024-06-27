@@ -32,7 +32,7 @@ class ShoppingCartViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         shopping_cart_items = ShoppingCartModel.objects.filter(buyer=user)
         serializer = ShoppingCartSerializer(shopping_cart_items, many=True)
         return Response(serializer.data)
-    
+
     @action(detail=True, methods=['post'],)
     def add_original_to_cart(self, request, pk=None):
         user = request.user
