@@ -84,7 +84,6 @@ DATABASES = {
         'PASSWORD': os.getenv("POSTGRES_PASSWORD", default="postgres"),
         'HOST': os.getenv("POSTGRES_HOST", default="db"),
         'PORT': os.getenv("POSTGRES_PORT", default=5432),
-        'TEST': {'NAME': 'test_database'},
     }
 }
 
