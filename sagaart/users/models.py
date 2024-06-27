@@ -13,12 +13,12 @@ class PermUser:
         return self.is_staff
 
     def has_module_perms(self, app_label):
-       return self.is_staff
+        return self.is_staff
 
 
 class Subscribe(models.Model):
     price = models.IntegerField('Cтоимость подписки')
-    sub_time = models.IntegerField('Срок подписки') # | models.DurationField()
+    sub_time = models.IntegerField('Срок подписки')  # | models.DurationField()
 
     def __str__(self):
         return (f'Длительность {self.sub_time} Стоимость {self.price}')

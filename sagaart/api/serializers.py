@@ -1,15 +1,14 @@
+import django.db
 from django.contrib.auth import get_user_model
 import django.contrib.auth.password_validation as validators
 from django.core import exceptions
 
 from rest_framework import serializers
-
-from artworks.models import ArtistModel, ArtworkModel
+from artworks.models import ArtistModel, ArtworkModel, FavoriteArtworkModel, StyleModel
 from users.models import Subscribe, UserSubscribe
 from artists.models import FavoriteArtistModel
 
 User = get_user_model()
-
 
 class UserCreateSerializer(serializers.ModelSerializer):
     '''Сериализатор создание пользователя'''
@@ -141,11 +140,6 @@ from django.core import exceptions
 from rest_framework import serializers
 
 from artworks.models import ArtistModel, ArtworkModel, StyleModel
-from users.models import Subscribe, UserSubscribe
-
-User = get_user_model()
-
-
 class UserCreateSerializer(serializers.ModelSerializer):
     '''Сериализатор создание пользователя'''
     password = serializers.CharField(write_only=True)
@@ -233,7 +227,7 @@ class ArtListSerializer(serializers.ModelSerializer):
     '''Сериализатор для каталога арт-объектов'''
     title = serializers.CharField(source='name')
     artist = serializers.CharField(source='author')
-    year = serializers.CharField(write_only=True)
+    year = serializers.CharField()
     email = serializers.EmailField(source='user.email', write_only=True)
     description = serializers.CharField()
     series = serializers.CharField()
@@ -249,7 +243,25 @@ class ArtListSerializer(serializers.ModelSerializer):
 
 class ArtObjectSerializer(ArtListSerializer):
     '''Сериализатор для карточки товара'''
-    pass
+    about_author = serializers.CharField(
+        source='author.about_artist', read_only=True
+    )
+    author_name = serializers.CharField(
+        source='author.name', read_only=True
+    )
+    author_photo = serializers.ImageField(
+        source='author.photo', read_only=True
+    )
+    author_user_id = serializers.IntegerField(
+        source='author.user_id', read_only=True
+    )
+
+    class Meta:
+        model = ArtworkModel
+        fields = (
+            FIELDS_FOR_ART_OBJECTS
+            + ('about_author', 'author_name', 'author_photo', 'author_user_id')
+        )
 
 
 class AuthorSerializer(serializers.ModelSerializer):
@@ -259,6 +271,15 @@ class AuthorSerializer(serializers.ModelSerializer):
         fields = ('id', 'name',)
 
 
+class FavoriteArtworkSerializer(serializers.ModelSerializer):
+    '''Сериализатор избранных произведений'''
+    artwork = serializers.IntegerField(source='artwork_id')
+
+    class Meta:
+        model = FavoriteArtworkModel
+        fields = '__all__'
+
+        
 class StyleSerializer(serializers.ModelSerializer):
     """Сериализатор для стилей"""
     class Meta:
