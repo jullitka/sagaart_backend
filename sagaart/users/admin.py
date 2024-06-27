@@ -1,11 +1,12 @@
 from typing import Any
+
+from django import forms
 from django.contrib import admin
 from django.contrib.auth import get_user_model
-from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from users.models import Subscribe, UserSubscribe
 from users import models
+from users.models import Subscribe, UserSubscribe
 
 User = get_user_model()
 
@@ -14,7 +15,7 @@ class MainUserCreationForm(forms.ModelForm):
     password = forms.CharField(
         label=_("Password"),
         strip=False,
-        widget=forms.PasswordInput(attrs={'autocomplete':'new_password'}),
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new_password'}),
         help_text=_('Введите пароль')
     )
 
@@ -72,7 +73,7 @@ class UserSubscribeAdmin(admin.ModelAdmin):
         'price',
         'sub_time',
         'time_off'
-        )
+    )
 
     def email(self, obj):
         return obj.user_id.email

@@ -1,5 +1,4 @@
 import os
-from distutils.util import strtobool
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -11,9 +10,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', default='token')
 
-DEBUG = strtobool(os.getenv("DEBUG", "True"))
+DEBUG = (os.getenv("DEBUG", "False"))
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', default='127.0.0.1, localhost').split(',')
+ALLOWED_HOSTS = os.getenv(
+    'ALLOWED_HOSTS', default='127.0.0.1,localhost'
+).split(',')
 
 # ALLOWED_HOSTS = ['db', '*']
 
@@ -37,7 +38,6 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'rest_framework.authtoken'
 ]
-
 
 AUTH_USER_MODEL = 'users.User'
 
@@ -132,7 +132,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media-back')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# REST 
+# REST
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -146,7 +146,7 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
 
-#Djoser
+# Djoser
 DJOSER = {
     'PERMISSIONS': {
         'user_list': ['rest_framework.permissions.AllowAny'],

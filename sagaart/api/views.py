@@ -1,4 +1,8 @@
+import datetime as dt
+
+import django.db.models.deletion
 from django.contrib.auth import get_user_model
+from django.db.models import F
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.conf import settings
@@ -15,14 +19,13 @@ from api.constants import (SUBSCRIPTION_API_SCHEMA_EXTENSIONS,
 from api.messages import SUBSCRIPTIONS
 from api.permissions import IsAdminOrRead, IsOwnerProfile
 from api.serializers import (ArtListSerializer, ArtObjectSerializer,
-                             SubscribeSerializer, SubscribeUserSerializer)
+                             FavoriteArtworkSerializer, SubscribeSerializer,
+                             SubscribeUserSerializer)
 from api.utils import get_object_by_filter
 from artists.models import SeriesModel
 from artworks.models import (ArtistModel, ArtworkModel, ArtworkPriceModel,
-                             StyleModel)
+                             FavoriteArtworkModel, StyleModel)
 from users.models import Subscribe, UserSubscribe
-import datetime as dt
-
 
 SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
 PERMISSIONS_USER = ['me', 'subscribe', 'my_subscription']
@@ -147,13 +150,65 @@ class PaintingsAPIView(generics.ListCreateAPIView):
         except Exception as er:
             return Response({'Ошибка': f' Нет поля {er}'})
         return Response(
-            data=(request.data, price,),
+            data=(request.data,),
             status=status.HTTP_201_CREATED
         )
 
 
-class RetrieveArtObject(generics.RetrieveAPIView):
+class RetrieveArtObject(generics.RetrieveDestroyAPIView):
     '''Представление для карточки арт-объекта'''
-    queryset = ArtworkModel.objects.all()
+    queryset = ArtworkModel.objects.all().select_related('author')
     serializer_class = ArtObjectSerializer
+    pagination_class = LimitOffsetPagination
     permission_classes = (IsAuthenticated,)
+
+    def delete(self, request, *args, **kwargs):
+        print(request)
+        artwork = ArtworkModel.objects.get(
+            id=kwargs['pk']
+        )
+        if artwork.user_id == request.user.id:
+            return super().delete(request, *args, **kwargs)
+        return Response(
+            {
+                'Ошибка': 'Невозможно удалить чужой объект'
+            }, status=status.HTTP_400_BAD_REQUEST
+        )
+
+
+class FavoriteArt(viewsets.ModelViewSet):
+    queryset = FavoriteArtworkModel.objects.all()
+    serializer_class = FavoriteArtworkSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def delete(self, request, *args, **kwargs):
+        destroy = FavoriteArtworkModel.objects.filter(
+            user_id=request.user.id,
+            artwork_id=request.data['artwork']
+        )
+        print(destroy)
+        if destroy:
+            destroy.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(
+            {'Ошибка': 'нет такой подписки'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    def get_list(self, request, *args, **kwargs):
+        result = FavoriteArtworkModel.objects.filter(user_id=self.request.user)
+        serializer = self.serializer_class(result, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        try:
+            result, create = FavoriteArtworkModel.objects.get_or_create(
+                user_id=request.user.id,
+                artwork_id=request.data['artwork']
+            )
+        except KeyError as er:
+            return Response({'Ошибка': f' Нет поля {er}'})
+        if create:
+            request.data['user'] = request.user.id
+            return Response(request.data, status=status.HTTP_201_CREATED)
+        return Response({'Ошибка': 'вы уже добавили в избранное'})
