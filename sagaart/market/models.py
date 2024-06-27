@@ -17,6 +17,12 @@ class ShoppingCartModel(models.Model):
         verbose_name='Покупатель',
         on_delete=models.CASCADE
     )
+    is_copy = models.BooleanField(
+        verbose_name='Принт картины',
+        default=False,
+        null=False,
+        blank=False
+    )
 
     class Meta:
         verbose_name = 'Корзина'
@@ -106,12 +112,17 @@ class PurchaseModel(models.Model):
     )
     delivery_date = models.DateTimeField(
         verbose_name='Ожидаемая дата доставки',
-        db_index=True
+        db_index=True,
+        null=True,
+        blank=True
     )
 
     class Meta:
         verbose_name = 'Покупка'
         verbose_name_plural = 'Покупки'
+        constraints = [
+            models.UniqueConstraint(fields=['artwork'], name='unique_artwork')
+        ]
 
     def __str__(self):
         return f'{self.artwork} из заказа {self.order}'

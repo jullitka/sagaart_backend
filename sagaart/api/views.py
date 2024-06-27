@@ -28,7 +28,7 @@ from market.models import NewsModel
 from api.serializers import NewsSerializer
 
 SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
-PERMISSIONS_USER = ['me',]
+PERMISSIONS_USER = ['me', 'subscribe', 'my_subscription']
 User = get_user_model()
 
 
@@ -37,30 +37,18 @@ class SubscribeViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = SubscribeSerializer
     permission_classes = [IsAdminOrRead, ]
 
-
-class TestViewSet(viewsets.ModelViewSet):
-    queryset = UserSubscribe.objects.all()
-    serializer_class = SubscribeUserSerializer
-
-
-class MainUserViewSet(UserViewSet):
-    '''Представление функционала пользователя'''
-    def get_permissions(self):
-        if self.action in PERMISSIONS_USER:
-            self.permission_classes = settings.PERMISSIONS.me
-        return super().get_permissions()
-
     def get_serializer_class(self, *args, **kwargs):
-        if self.action == "subscribe" or self.action == "my_subscription":
+        if self.action == "subscribe":
             return SubscribeUserSerializer
         return super().get_serializer_class(*args, **kwargs)
 
-    @action(['post', 'delete'], detail=True)
-    def subscribe(self, request, sub_id, *args, **kwargs):
+    @action(['post', 'delete'], detail=True,
+            permission_classes=[IsOwnerProfile,])
+    def subscribe(self, request, pk, *args, **kwargs):
         user = request.user
         subscription = get_object_or_404(
             Subscribe,
-            pk=sub_id
+            pk=pk
         )
         if request.method == 'POST':
             if UserSubscribe.objects.filter(user_id=user).exists():
@@ -90,7 +78,20 @@ class MainUserViewSet(UserViewSet):
             user_sub.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(["get"], detail=True, permission_classes=[IsAuthenticated])
+
+class MainUserViewSet(UserViewSet):
+    '''Представление функционала пользователя'''
+    def get_permissions(self):
+        if self.action in PERMISSIONS_USER:
+            self.permission_classes = settings.PERMISSIONS.me
+        return super().get_permissions()
+
+    def get_serializer_class(self, *args, **kwargs):
+        if self.action == "my_subscription":
+            return SubscribeUserSerializer
+        return super().get_serializer_class(*args, **kwargs)
+
+    @action(["get"], detail=False, permission_classes=[IsAuthenticated])
     def my_subscription(self, request, *args, **kwargs):
         user = request.user
         try:

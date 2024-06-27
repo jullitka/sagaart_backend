@@ -16,6 +16,8 @@ ALLOWED_HOSTS = os.getenv(
     'ALLOWED_HOSTS', default='127.0.0.1,localhost'
 ).split(',')
 
+# ALLOWED_HOSTS = ['db', '*']
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -36,11 +38,6 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'rest_framework.authtoken'
 ]
-REST_FRAMEWORK = {
-    'DEFAULT_FILTER_BACKENDS': [
-        'django_filters.rest_framework.DjangoFilterBackend'
-    ]
-}
 
 AUTH_USER_MODEL = 'users.User'
 
@@ -87,6 +84,7 @@ DATABASES = {
         'PASSWORD': os.getenv("POSTGRES_PASSWORD", default="postgres"),
         'HOST': os.getenv("POSTGRES_HOST", default="db"),
         'PORT': os.getenv("POSTGRES_PORT", default=5432),
+        'TEST': {'NAME': 'test_database'},
     }
 }
 
@@ -124,10 +122,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = '/static/'
+STATIC_URL = '/static-back/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static-back')
 
-MEDIA_URL = '/media/'
+MEDIA_URL = '/media-back/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media-back')
 
 # Default primary key field type
@@ -145,7 +143,8 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 21
+    'PAGE_SIZE': 21,
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
 
 # Djoser
