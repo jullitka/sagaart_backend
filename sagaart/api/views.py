@@ -37,7 +37,6 @@ User = get_user_model()
 class SubscribeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Subscribe.objects.all()
     serializer_class = SubscribeSerializer
-    permission_classes = [IsAdminOrRead, ]
 
     def get_serializer_class(self, *args, **kwargs):
         if self.action == "subscribe":
@@ -45,6 +44,7 @@ class SubscribeViewSet(viewsets.ReadOnlyModelViewSet):
         return super().get_serializer_class(*args, **kwargs)
 
     def get_permissions(self):
+        permission_classes = [IsAdminOrRead,]
         if self.action == "subscribe":
             permission_classes = [IsAuthenticated, ]
         return [permission() for permission in permission_classes]
