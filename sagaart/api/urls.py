@@ -14,11 +14,10 @@ v1_router.register(r'orders', OrdersViewSet, basename='orders')
 v1_router.register(r'delivery', DeliveryViewSet, basename='delivery')
 
 urlpatterns = [
-    path('', include(v1_router.urls)),
+    path('v1/', include(v1_router.urls)),
     path(
-        'artworks/', PaintingsAPIView.as_view(), name='paintings'
+        'v1/artworks/', PaintingsAPIView.as_view(), name='paintings'
     ),
-    path('artworks/<int:pk>', RetrieveArtObject.as_view()),
-    path('artworks/favorite/', FavoriteArt.as_view({'get': 'get_list'})),
-    path('v1', include(v1_router.urls)),
+    path('v1/artworks/<int:pk>', RetrieveArtObject.as_view()),
+    path('v1/artworks/favorite/', FavoriteArt.as_view({'get': 'get_list'})),
 ]
