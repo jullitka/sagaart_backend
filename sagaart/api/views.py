@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.conf import settings
 from djoser.views import UserViewSet
+
 from rest_framework import filters, generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
@@ -23,6 +24,8 @@ from artists.models import SeriesModel
 from artworks.models import (ArtistModel, ArtworkModel, ArtworkPriceModel,
                              FavoriteArtworkModel, StyleModel)
 from users.models import Subscribe, UserSubscribe
+from market.models import NewsModel
+from api.serializers import NewsSerializer
 
 SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
 PERMISSIONS_USER = ['me',]
@@ -143,7 +146,10 @@ class PaintingsAPIView(generics.ListCreateAPIView):
             price = ArtworkPriceModel.objects.filter(artwork=art)
             art.price = price
         except Exception as er:
-            return Response({'Ошибка': f' Нет поля {er}'})
+            return Response(
+                {'Ошибка': f' Нет поля {er}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         return Response(
             data=(request.data,),
             status=status.HTTP_201_CREATED
@@ -172,6 +178,7 @@ class RetrieveArtObject(generics.RetrieveDestroyAPIView):
 
 
 class FavoriteArt(viewsets.ModelViewSet):
+    '''Представление избранных работ'''
     queryset = FavoriteArtworkModel.objects.all()
     serializer_class = FavoriteArtworkSerializer
     permission_classes = (IsAuthenticated,)
@@ -181,7 +188,6 @@ class FavoriteArt(viewsets.ModelViewSet):
             user_id=request.user.id,
             artwork_id=request.data['artwork']
         )
-        print(destroy)
         if destroy:
             destroy.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -207,3 +213,10 @@ class FavoriteArt(viewsets.ModelViewSet):
             request.data['user'] = request.user.id
             return Response(request.data, status=status.HTTP_201_CREATED)
         return Response({'Ошибка': 'вы уже добавили в избранное'})
+
+
+class NewsViewSet(generics.ListAPIView):
+    '''Представление для отображение активных новостей'''
+    queryset = NewsModel.objects.filter(is_active=True).order_by('-date_pub')
+    serializer_class = NewsSerializer
+

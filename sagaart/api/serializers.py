@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from artworks.models import ArtistModel, ArtworkModel, FavoriteArtworkModel
+from market.models import NewsModel
 from users.models import Subscribe, UserSubscribe
 
 User = get_user_model()
@@ -138,4 +139,13 @@ class FavoriteArtworkSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FavoriteArtworkModel
+        fields = '__all__'
+
+
+class NewsSerializer(serializers.ModelSerializer):
+    '''Сериализатор новостей'''
+    date_pub = serializers.DateTimeField('%d.%m.%Y')
+
+    class Meta:
+        model = NewsModel
         fields = '__all__'

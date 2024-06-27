@@ -55,7 +55,7 @@ class ArtistModel(models.Model):
 
 
 class EducationAuthorModel(models.Model):
-    """Модель связи образотвальельных учреждени и атворов"""
+    """Модель связи образотвальельных учреждени и авторов"""
     artist = models.ForeignKey(
         ArtistModel,
         verbose_name='Имя и фамилия автора',
@@ -158,7 +158,7 @@ class ExhibitionParticipantModel(models.Model):
 
 
 class FavoriteArtistModel(models.Model):
-    """Модель избранных произведений искусства"""
+    """Модель избранных художников"""
     artist = models.ForeignKey(
         ArtistModel,
         verbose_name='Автор',
