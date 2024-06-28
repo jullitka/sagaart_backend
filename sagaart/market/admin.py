@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import OrderModel, PurchaseModel, ShoppingCartModel
+from .models import OrderModel, PurchaseModel, ShoppingCartModel, NewsModel
 
 
 @admin.register(OrderModel)
@@ -17,3 +17,8 @@ class PurchaseModelAdmin(admin.ModelAdmin):
 @admin.register(ShoppingCartModel)
 class ShoppingCartModelAdmin(admin.ModelAdmin):
     list_display = ['id', 'artwork', 'buyer']
+
+
+@admin.register(NewsModel)
+class NewsModelAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'text', 'is_active', 'date_pub')

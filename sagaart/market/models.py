@@ -137,3 +137,18 @@ class PurchaseModel(models.Model):
 
     def __str__(self):
         return f'{self.artwork} из заказа {self.order}'
+
+
+class NewsModel(models.Model):
+    name = models.CharField(
+        max_length=100, 
+        null=False, 
+        blank=False, 
+        unique=True
+    )
+    text = models.TextField()
+    is_active = models.BooleanField()
+    date_pub = models.DateTimeField(auto_now_add=True,)
+
+    def __str__(self) -> str:
+        return f'Новость с название {self.name}. {"Активно" if self.is_active else "Неактивно"}'
