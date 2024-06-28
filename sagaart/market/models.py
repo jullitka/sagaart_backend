@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 
 from .constants import DELIVERY_TYPE_CHOICES, PAYMENT_METHOD_CHOICES
 from artworks.models import ArtworkModel
@@ -30,6 +31,16 @@ class ShoppingCartModel(models.Model):
 
     def __str__(self):
         return f'{self.artwork} в корзине {self.buyer}'
+
+    def clean(self):
+        if not self.is_copy and self.__class__.objects.filter(
+            artwork=self.artwork, buyer=self.buyer, is_copy=False
+        ).exists():
+            raise ValidationError('Это произведение уже добавлено в корзину')
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
 
 
 class OrderModel(models.Model):

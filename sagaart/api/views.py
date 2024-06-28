@@ -17,7 +17,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from api.messages import SUBSCRIPTIONS, ARTISTS
-from api.constants import (SUBSCRIPTION_API_SCHEMA_EXTENSIONS,
+from api.constants import (ARTVORK_API_SCHEMA_EXTENSIONS,
+                           ARTVORKS_API_SCHEMA_EXTENSIONS,
+                           FAVORIRE_ARTIST_API_SCHEMA_EXTENSIONS,
+                           FAVORITE_ARTVORK_API_SCHEMA_EXTENSIONS,
+                           SUBSCRIPTION_API_SCHEMA_EXTENSIONS,
                            USER_API_SCHEMA_EXTENSIONS)
 
 from api.permissions import IsAdminOrRead, IsOwnerProfile
@@ -118,6 +122,7 @@ class MainUserViewSet(UserViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@extend_schema_view(**ARTVORKS_API_SCHEMA_EXTENSIONS)
 class PaintingsAPIView(generics.ListCreateAPIView):
     '''Представление для списка и создания арт-объекта'''
     queryset = ArtworkModel.objects.all()
@@ -168,8 +173,9 @@ class PaintingsAPIView(generics.ListCreateAPIView):
             data=(request.data,),
             status=status.HTTP_201_CREATED
         )
+    
 
-
+@extend_schema_view(**ARTVORK_API_SCHEMA_EXTENSIONS)
 class RetrieveArtObject(generics.RetrieveDestroyAPIView):
     '''Представление для карточки арт-объекта'''
     queryset = ArtworkModel.objects.all().select_related('author')
@@ -190,7 +196,7 @@ class RetrieveArtObject(generics.RetrieveDestroyAPIView):
             }, status=status.HTTP_400_BAD_REQUEST
         )
 
-
+@extend_schema_view(**FAVORITE_ARTVORK_API_SCHEMA_EXTENSIONS)
 class FavoriteArt(viewsets.ModelViewSet):
     '''Представление избранных работ'''
     queryset = FavoriteArtworkModel.objects.all()
@@ -235,6 +241,7 @@ class NewsViewSet(generics.ListAPIView):
     serializer_class = NewsSerializer
 
     
+@extend_schema_view(**FAVORIRE_ARTIST_API_SCHEMA_EXTENSIONS)
 class FavoriteArtistsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = FavoriteArtistModel.objects.all()
     serializer_class = FavoriteSerializer
