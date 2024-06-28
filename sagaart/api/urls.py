@@ -2,6 +2,7 @@ from django.urls import include, path
 from rest_framework import routers
 
 from api.views import FavoriteArt, PaintingsAPIView, RetrieveArtObject
+from api.views import NewsViewSet
 from .market_views import DeliveryViewSet, OrdersViewSet, ShoppingCartViewSet
 from .views import PaintingsAPIView, RetrieveArtObject, FavoriteArtistsViewSet
 
@@ -21,6 +22,8 @@ urlpatterns = [
     path(
         'v1/artworks/', PaintingsAPIView.as_view(), name='paintings'
     ),
+    path('v1/news/', NewsViewSet.as_view()),
+    path('v1', include(v1_router.urls)),
     path('v1/artworks/<int:pk>', RetrieveArtObject.as_view()),
     path('v1/artworks/favorite/', FavoriteArt.as_view({'get': 'get_list'})),
 ]
