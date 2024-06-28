@@ -15,6 +15,7 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from algorithm.estimation import estimation, get_data
 from api.messages import SUBSCRIPTIONS, ARTISTS
 from api.constants import (SUBSCRIPTION_API_SCHEMA_EXTENSIONS,
                            USER_API_SCHEMA_EXTENSIONS)
@@ -154,8 +155,25 @@ class PaintingsAPIView(generics.ListCreateAPIView):
                 author_signature=data['author_signature'],
                 series=series
             )
-            price = ArtworkPriceModel.objects.filter(artwork=art)
-            art.price = price
+            try:
+                # получение цены с помощью алгоритма оценки
+                data_for_estimate = get_data(
+                    category=None, year=data['year'],
+                    dimensions=data['size'], materials=data['brushstrokes_material'],
+                    author_name=data['artist']
+                )
+                price = estimation(data_for_estimate)
+                ArtworkPriceModel.objects.create(artwork=art, original_price=price)
+                art.is_estimate = True
+                art.save()
+            except:
+                return Response(
+                    {"Алгоритм оценки временно не работает, работа сохранена в базе без оценки"},
+                    status=status.HTTP_201_CREATED
+                )
+
+            # price = ArtworkPriceModel.objects.filter(artwork=art)
+            # art.price = price
         except Exception as er:
             return Response({'Ошибка': f' Нет поля {er}'})
         return Response(
