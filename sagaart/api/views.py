@@ -13,7 +13,7 @@ from rest_framework import filters, generics, status, viewsets, mixins
 from drf_spectacular.utils import extend_schema_view
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from api.messages import SUBSCRIPTIONS, ARTISTS
@@ -120,10 +120,10 @@ class MainUserViewSet(UserViewSet):
 
 class PaintingsAPIView(generics.ListCreateAPIView):
     '''Представление для списка и создания арт-объекта'''
-    queryset = ArtworkModel.objects.all()
+    queryset = ArtworkModel.objects.filter(is_on_sold='on sale')
     serializer_class = ArtListSerializer
     pagination_class = LimitOffsetPagination
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
     filterset_fields = (
         'brushstrokes_material', 'size', 'decoration',
@@ -175,10 +175,9 @@ class RetrieveArtObject(generics.RetrieveDestroyAPIView):
     queryset = ArtworkModel.objects.all().select_related('author')
     serializer_class = ArtObjectSerializer
     pagination_class = LimitOffsetPagination
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def delete(self, request, *args, **kwargs):
-        print(request)
         artwork = ArtworkModel.objects.get(
             id=kwargs['pk']
         )
@@ -211,7 +210,9 @@ class FavoriteArt(viewsets.ModelViewSet):
         )
 
     def get_list(self, request, *args, **kwargs):
-        result = FavoriteArtworkModel.objects.filter(user_id=self.request.user)
+        result = FavoriteArtworkModel.objects.filter(
+            user_id=self.request.user
+        ).select_related('artwork')
         serializer = self.serializer_class(result, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -234,7 +235,7 @@ class NewsViewSet(generics.ListAPIView):
     queryset = NewsModel.objects.filter(is_active=True).order_by('-date_pub')
     serializer_class = NewsSerializer
 
-    
+
 class FavoriteArtistsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = FavoriteArtistModel.objects.all()
     serializer_class = FavoriteSerializer

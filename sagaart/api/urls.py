@@ -25,5 +25,15 @@ urlpatterns = [
     path('v1/news/', NewsViewSet.as_view()),
     path('v1', include(v1_router.urls)),
     path('v1/artworks/<int:pk>', RetrieveArtObject.as_view()),
-    path('v1/artworks/favorite/', FavoriteArt.as_view({'get': 'get_list'})),
+    path(
+        'v1/artworks/favorite_arts/',
+        FavoriteArt.as_view(
+            {
+                'get': 'get_list',
+                'post': 'post',
+                'delete': 'delete'
+            }
+        ),
+        name='favorite_arts'
+    ),
 ]
