@@ -8,6 +8,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from djoser.conf import settings
 from djoser.views import UserViewSet
 
+
 from rest_framework import filters, generics, status, viewsets, mixins
 from drf_spectacular.utils import extend_schema_view
 from rest_framework.decorators import action
@@ -15,8 +16,13 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from algorithm.estimation import estimation, get_data
 from api.messages import SUBSCRIPTIONS, ARTISTS
-from api.constants import (SUBSCRIPTION_API_SCHEMA_EXTENSIONS,
+from api.constants import (ARTVORK_API_SCHEMA_EXTENSIONS,
+                           ARTVORKS_API_SCHEMA_EXTENSIONS,
+                           FAVORIRE_ARTIST_API_SCHEMA_EXTENSIONS,
+                           FAVORITE_ARTVORK_API_SCHEMA_EXTENSIONS,
+                           SUBSCRIPTION_API_SCHEMA_EXTENSIONS,
                            USER_API_SCHEMA_EXTENSIONS)
 
 from api.permissions import IsAdminOrRead, IsOwnerProfile
@@ -28,6 +34,8 @@ from artists.models import SeriesModel, FavoriteArtistModel
 from artworks.models import (ArtistModel, ArtworkModel, ArtworkPriceModel,
                              FavoriteArtworkModel, StyleModel)
 from users.models import Subscribe, UserSubscribe
+from market.models import NewsModel
+from api.serializers import NewsSerializer
 
 SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
 PERMISSIONS_USER = ['me', 'subscribe', 'my_subscription']
@@ -115,6 +123,7 @@ class MainUserViewSet(UserViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@extend_schema_view(**ARTVORKS_API_SCHEMA_EXTENSIONS)
 class PaintingsAPIView(generics.ListCreateAPIView):
     '''Представление для списка и создания арт-объекта'''
     queryset = ArtworkModel.objects.all()
@@ -154,16 +163,37 @@ class PaintingsAPIView(generics.ListCreateAPIView):
                 author_signature=data['author_signature'],
                 series=series
             )
-            price = ArtworkPriceModel.objects.filter(artwork=art)
-            art.price = price
+            try:
+                # получение цены с помощью алгоритма оценки
+                data_for_estimate = get_data(
+                    category=None, year=data['year'],
+                    dimensions=data['size'], materials=data['brushstrokes_material'],
+                    author_name=data['artist']
+                )
+                price = estimation(data_for_estimate)
+                ArtworkPriceModel.objects.create(artwork=art, original_price=price)
+                art.is_estimate = True
+                art.save()
+            except:
+                return Response(
+                    {"Алгоритм оценки временно не работает, работа сохранена в базе без оценки"},
+                    status=status.HTTP_201_CREATED
+                )
+
+            # price = ArtworkPriceModel.objects.filter(artwork=art)
+            # art.price = price
         except Exception as er:
-            return Response({'Ошибка': f' Нет поля {er}'})
+            return Response(
+                {'Ошибка': f' Нет поля {er}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         return Response(
             data=(request.data,),
             status=status.HTTP_201_CREATED
         )
+    
 
-
+@extend_schema_view(**ARTVORK_API_SCHEMA_EXTENSIONS)
 class RetrieveArtObject(generics.RetrieveDestroyAPIView):
     '''Представление для карточки арт-объекта'''
     queryset = ArtworkModel.objects.all().select_related('author')
@@ -184,8 +214,9 @@ class RetrieveArtObject(generics.RetrieveDestroyAPIView):
             }, status=status.HTTP_400_BAD_REQUEST
         )
 
-
+@extend_schema_view(**FAVORITE_ARTVORK_API_SCHEMA_EXTENSIONS)
 class FavoriteArt(viewsets.ModelViewSet):
+    '''Представление избранных работ'''
     queryset = FavoriteArtworkModel.objects.all()
     serializer_class = FavoriteArtworkSerializer
     permission_classes = (IsAuthenticated,)
@@ -195,7 +226,6 @@ class FavoriteArt(viewsets.ModelViewSet):
             user_id=request.user.id,
             artwork_id=request.data['artwork']
         )
-        print(destroy)
         if destroy:
             destroy.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -223,6 +253,13 @@ class FavoriteArt(viewsets.ModelViewSet):
         return Response({'Ошибка': 'вы уже добавили в избранное'})
 
 
+class NewsViewSet(generics.ListAPIView):
+    '''Представление для отображение активных новостей'''
+    queryset = NewsModel.objects.filter(is_active=True).order_by('-date_pub')
+    serializer_class = NewsSerializer
+
+    
+@extend_schema_view(**FAVORIRE_ARTIST_API_SCHEMA_EXTENSIONS)
 class FavoriteArtistsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = FavoriteArtistModel.objects.all()
     serializer_class = FavoriteSerializer

@@ -4,6 +4,8 @@ import django.contrib.auth.password_validation as validators
 from django.core import exceptions
 
 from rest_framework import serializers
+
+from market.models import NewsModel
 from artworks.models import ArtistModel, ArtworkModel, FavoriteArtworkModel, StyleModel
 from users.models import Subscribe, UserSubscribe
 from artists.models import FavoriteArtistModel
@@ -279,6 +281,14 @@ class FavoriteArtworkSerializer(serializers.ModelSerializer):
         model = FavoriteArtworkModel
         fields = '__all__'
 
+
+class NewsSerializer(serializers.ModelSerializer):
+    '''Сериализатор новостей'''
+    date_pub = serializers.DateTimeField('%d.%m.%Y')
+
+    class Meta:
+        model = NewsModel
+        fields = '__all__'
         
 class StyleSerializer(serializers.ModelSerializer):
     """Сериализатор для стилей"""

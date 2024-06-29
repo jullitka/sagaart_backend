@@ -1,6 +1,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
+from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema_view
-from rest_framework import filters, mixins, viewsets
+from rest_framework import filters, mixins, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -31,6 +32,49 @@ class ShoppingCartViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         shopping_cart_items = ShoppingCartModel.objects.filter(buyer=user)
         serializer = ShoppingCartSerializer(shopping_cart_items, many=True)
         return Response(serializer.data)
+
+    @action(detail=True, methods=['post'],)
+    def add_original_to_cart(self, request, pk=None):
+        user = request.user
+        artwork = get_object_or_404(ArtworkModel, pk=pk)
+        if ShoppingCartModel.objects.filter(
+            buyer=user, artwork=artwork, is_copy=False
+        ).exists():
+            return Response({'Это произведение уже добавлено в корзину'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        ShoppingCartModel.objects.create(buyer=user, artwork=artwork)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=['post'],)
+    def add_copy_to_cart(self, request, pk=None):
+        user = request.user
+        artwork = get_object_or_404(ArtworkModel, pk=pk)
+        ShoppingCartModel.objects.create(
+            buyer=user, artwork=artwork, is_copy=True
+        )
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=['delete'])
+    def remove_original_from_cart(self, request, pk=None):
+        artwork = get_object_or_404(ArtworkModel, pk=pk)
+        artwork_in_cart = get_object_or_404(
+            ShoppingCartModel, artwork=artwork, is_copy=False
+        )
+        artwork_in_cart.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    @action(detail=True, methods=['delete'])
+    def remove_copy_from_cart(self, request, pk=None):
+        artwork = get_object_or_404(ArtworkModel, pk=pk)
+        artwork_in_cart = ShoppingCartModel.objects.filter(
+            buyer=request.user, artwork=artwork, is_copy=True
+        ).first()
+        if artwork_in_cart:
+            artwork_in_cart.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response(
+            {'Такого объекта нет в корзине'}, status=status.HTTP_404_NOT_FOUND
+        )
 
 
 @extend_schema_view(**ORDER_API_SCHEMA_EXTENSIONS)
