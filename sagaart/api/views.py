@@ -229,12 +229,12 @@ class FavoriteArtistsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     permission_classes = [IsAuthenticated, ]
 
     def get_queryset(self):
-        if self.action == "add_favorite":
+        if self.action == "edit_favorite":
             return ArtistModel.objects.all()
         return FavoriteArtistModel.objects.filter(user=self.request.user)
 
     @action(['post', 'delete'], detail=True)
-    def add_favorite(self, request, *args, **kwargs):
+    def edit_favorite(self, request, *args, **kwargs):
         user = request.user
         try:
             artist = self.get_object()

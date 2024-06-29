@@ -14,7 +14,7 @@ v1_router.register(
 )
 v1_router.register(r'orders', OrdersViewSet, basename='orders')
 v1_router.register(r'delivery', DeliveryViewSet, basename='delivery')
-v1_router.register(r'favorite', FavoriteArtistsViewSet, basename='favorite')
+v1_router.register(r'favorite_artists', FavoriteArtistsViewSet, basename='favorite_artists')
 
 urlpatterns = [
     path('v1/', include(v1_router.urls)),
