@@ -5,7 +5,10 @@ __pycache__/
 .vscode/
 # TODO
 */users/views.py
-# */users/migrations/
+*/users/migrations/
+*/artists/migrations/
+*/artworks/migrations/
+*/market/migrations/
 */media-back/
 # *Dockerfile
 # C extensions
