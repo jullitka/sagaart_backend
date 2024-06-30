@@ -2,8 +2,11 @@ import django.db
 from django.contrib.auth import get_user_model
 import django.contrib.auth.password_validation as validators
 from django.core import exceptions
+from django.core.files.base import ContentFile
 
 from rest_framework import serializers
+
+import base64
 
 from market.models import NewsModel
 from artworks.models import ArtistModel, ArtworkModel, FavoriteArtworkModel, StyleModel, ArtworkPriceModel
@@ -11,6 +14,17 @@ from users.models import Subscribe, UserSubscribe
 from artists.models import FavoriteArtistModel
 
 User = get_user_model()
+
+
+class Base64ImageField(serializers.ImageField):
+    def to_internal_value(self, data):
+        if isinstance(data, str) and data.startswith('data:image'):
+            format, imgstr = data.split(';base64,')
+            ext = format.split('/')[-1]
+
+            data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
+
+        return super().to_internal_value(data)
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
@@ -92,7 +106,7 @@ FIELDS_FOR_ART_OBJECTS = (
     'title', 'artist', 'description', 'imageUrl',
     'size', 'orientation', 'brushstrokes_material',
     'style', 'decoration', 'year',
-    'series', 'author_signature', 'email',
+    'series', 'author_signature', 'email', 'id'
 )
 
 
@@ -104,8 +118,7 @@ class ArtListSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source='user.email', write_only=True)
     description = serializers.CharField()
     series = serializers.CharField()
-    imageUrl = serializers.CharField(source='image')
-
+    imageUrl = Base64ImageField(source='image')
     class Meta:
         model = ArtworkModel
         fields = FIELDS_FOR_ART_OBJECTS
@@ -200,7 +213,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
     '''Сериализатор для избранных авторов'''
     name = serializers.CharField(source='artist.name')
     about_artist = serializers.CharField(source='artist.about_artist')
-    imageUrl = serializers.CharField(source='artist.photo')
+    imageUrl = Base64ImageField(source='artist.photo')
 
     class Meta:
         model = FavoriteArtistModel
