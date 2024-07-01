@@ -9,7 +9,9 @@ from rest_framework import serializers
 import base64
 
 from market.models import NewsModel
-from artworks.models import ArtistModel, ArtworkModel, FavoriteArtworkModel, StyleModel, ArtworkPriceModel
+from artworks.models import (ArtistModel, ArtworkModel, FavoriteArtworkModel,
+                             StyleModel, ArtworkPriceModel, SeriesModel,
+                             CategoryModel)
 from users.models import Subscribe, UserSubscribe
 from artists.models import FavoriteArtistModel
 
@@ -222,3 +224,102 @@ class FavoriteSerializer(serializers.ModelSerializer):
             'about_artist',
             'imageUrl'
         )
+
+
+"""
+Группа сериализаторов для эндпоинтов v2
+"""
+class TestArtistModelSerializer(serializers.ModelSerializer):
+    artist_id = serializers.IntegerField(source='id', read_only=True)
+    class Meta:
+        model = ArtistModel
+        fields = (
+            'name',
+            'about_artist',
+            'photo',
+            'artist_id'
+        )
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CategoryModel
+        fields = ('name', )
+
+class SeriesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SeriesModel
+        fields = ('name', )
+
+class TestArtWrokSerializer(serializers.ModelSerializer):
+    author = TestArtistModelSerializer()
+    style = StyleSerializer(allow_null=True)
+    series = SeriesSerializer(allow_null=True)
+    category = CategorySerializer(allow_null=True)
+    #image = Base64ImageField()
+    price = serializers.SerializerMethodField()
+    class Meta:
+        model = ArtworkModel
+        fields = (
+            'author',
+            'name',
+            'year',
+            'size',
+            'style',
+            'series',
+            'category',
+            'brushstrokes_material',
+            'is_estimate',
+            'is_on_sold',
+            'orientation',
+            'decoration',
+            'author_signature',
+            'description',
+            #'image',
+            'price',
+            'id'
+        )
+    
+    def get_price(self, price):
+        # Метод полуения цены работает как для создания так и для представления
+        price = 120
+        return price
+    
+    def create(self, validated_data):
+        '''
+            При создании вытаскивает стиль и серию если поля незаполнены
+            выставляет null, в ином случае либо достает данные(стиля, серии)из бд
+            либо создает новые
+        '''
+        style = validated_data.pop('style')
+        series = validated_data.pop('series')
+        artwork = ArtworkModel.objects.create(**validated_data)
+        if series:
+            current_series, _ = SeriesModel.objects.get_or_create(
+                **series, author=validated_data['author']
+            )
+            artwork.series = current_series
+        if style:
+            current_style, _ = StyleModel.objects.get_or_create(
+                **style
+            )
+            artwork.style = current_style
+        
+        
+        return artwork
+
+    def validate_category(self, category):
+        '''
+            Выдает категорию либо оствляет поле пустым в случаях
+            если категория не найдена или не задана
+        '''
+        if category:
+            try:
+                return CategoryModel.objects.get(name=category['name'])
+            except Exception:
+                return None
+        return None
+
+    def validate_author(self, author):
+        artist, _ = ArtistModel.objects.get_or_create(**author)
+        return artist

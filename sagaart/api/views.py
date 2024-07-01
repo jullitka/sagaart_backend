@@ -16,7 +16,7 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
-from algorithm.estimation import estimation, get_data
+#from algorithm.estimation import estimation, get_data
 from api.messages import SUBSCRIPTIONS, ARTISTS
 from api.constants import (ARTVORK_API_SCHEMA_EXTENSIONS,
                            ARTVORKS_API_SCHEMA_EXTENSIONS,
@@ -28,7 +28,8 @@ from api.constants import (ARTVORK_API_SCHEMA_EXTENSIONS,
 from api.permissions import IsAdminOrRead, IsOwnerProfile
 from api.serializers import (ArtListSerializer, ArtObjectSerializer,
                              SubscribeSerializer, SubscribeUserSerializer,
-                             FavoriteSerializer, FavoriteArtworkSerializer)
+                             FavoriteSerializer, FavoriteArtworkSerializer,
+                             TestArtWrokSerializer)
 from api.utils import get_object_by_filter
 from artists.models import SeriesModel, FavoriteArtistModel
 from artworks.models import (ArtistModel, ArtworkModel, ArtworkPriceModel,
@@ -212,6 +213,19 @@ class RetrieveArtObject(generics.RetrieveDestroyAPIView):
                 'Ошибка': 'Невозможно удалить чужой объект'
             }, status=status.HTTP_400_BAD_REQUEST
         )
+    
+
+class TestArtworkViewSet(viewsets.ModelViewSet):
+    queryset = ArtworkModel.objects.all()
+    serializer_class = TestArtWrokSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly, )
+
+    def perform_create(self, serializer):
+        return serializer.save(
+            user = self.request.user 
+        )
+    
+
 
 @extend_schema_view(**FAVORITE_ARTVORK_API_SCHEMA_EXTENSIONS)
 class FavoriteArt(viewsets.ModelViewSet):
