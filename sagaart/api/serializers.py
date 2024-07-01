@@ -8,7 +8,7 @@ from rest_framework import serializers
 
 import base64
 
-from market.models import NewsModel
+from news.models import NewsModel
 from artworks.models import (ArtistModel, ArtworkModel,
                              FavoriteArtworkModel, StyleModel,
                              ArtworkPriceModel)
