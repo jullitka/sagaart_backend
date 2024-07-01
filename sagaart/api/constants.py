@@ -1,4 +1,4 @@
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, extend_schema_view
 
 
 ORDER_API_SCHEMA_EXTENSIONS = {
@@ -70,4 +70,13 @@ SUBSCRIPTION_API_SCHEMA_EXTENSIONS = {
     'subscribe': extend_schema(
         tags=['Подписка'],
         summary='Оформление и удаление подписки'),
+}
+
+FAVORITE_ART_API_SCHEMA_EXTENSIONS = {
+    'destroy': extend_schema(
+        tags=['Избранные арты'],
+        summary='Удаление избранного арта',
+        parameters=['artworks'],
+    ),
+
 }

@@ -156,9 +156,9 @@ class ArtPriceSerializer(serializers.ModelSerializer):
 
 class FavoriteArtworkSerializer(serializers.ModelSerializer):
     '''Сериализатор избранных произведений'''
-    art_photo = serializers.ImageField(source='artwork.image')
-    artist_name = serializers.CharField(source='artwork.author.name')
-    art_name = serializers.CharField(source='artwork.name')
+    art_photo = serializers.ImageField(source='artwork.image', read_only=True)
+    artist_name = serializers.CharField(source='artwork.author.name', read_only=True)
+    art_name = serializers.CharField(source='artwork.name', read_only=True)
     original_price = serializers.SerializerMethodField()
     poster_price = serializers.SerializerMethodField()
 

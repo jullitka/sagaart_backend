@@ -18,7 +18,7 @@ from rest_framework.response import Response
 
 from api.messages import SUBSCRIPTIONS, ARTISTS
 from api.constants import (SUBSCRIPTION_API_SCHEMA_EXTENSIONS,
-                           USER_API_SCHEMA_EXTENSIONS)
+                           USER_API_SCHEMA_EXTENSIONS, FAVORITE_ART_API_SCHEMA_EXTENSIONS)
 
 from api.permissions import IsAdminOrRead, IsOwnerProfile
 from api.serializers import (ArtListSerializer, ArtObjectSerializer,
@@ -31,6 +31,8 @@ from artworks.models import (ArtistModel, ArtworkModel, ArtworkPriceModel,
 from users.models import Subscribe, UserSubscribe
 from market.models import NewsModel
 from api.serializers import NewsSerializer
+from django.core.mail import send_mail
+
 
 SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
 PERMISSIONS_USER = ['me', 'subscribe', 'my_subscription']
@@ -157,13 +159,14 @@ class PaintingsAPIView(generics.ListCreateAPIView):
                 author_signature=data['author_signature'],
                 series=series
             )
-            price = ArtworkPriceModel.objects.filter(artwork=art)
-            art.price = price
+            #price = ArtworkPriceModel.objects.filter(artwork=art)
+            #art.price = price
         except Exception as er:
             return Response(
                 {'Ошибка': f' Нет поля {er}'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        #send_mail(subject='вы создали', message='aaaa', from_email=None, recipient_list=('@gmail.com',))
         return Response(
             data=(request.data,),
             status=status.HTTP_201_CREATED
@@ -190,6 +193,7 @@ class RetrieveArtObject(generics.RetrieveDestroyAPIView):
         )
 
 
+#@extend_schema_view(**FAVORITE_ART_API_SCHEMA_EXTENSIONS)
 class FavoriteArt(viewsets.ModelViewSet):
     '''Представление избранных работ'''
     queryset = FavoriteArtworkModel.objects.all()
@@ -203,7 +207,8 @@ class FavoriteArt(viewsets.ModelViewSet):
         )
         if destroy:
             destroy.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response({'status': 'Успешно удалено'},
+                            status=status.HTTP_204_NO_CONTENT)
         return Response(
             {'Ошибка': 'нет такой подписки'},
             status=status.HTTP_400_BAD_REQUEST
@@ -226,13 +231,15 @@ class FavoriteArt(viewsets.ModelViewSet):
             return Response({'Ошибка': f' Нет поля {er}'})
         if create:
             request.data['user'] = request.user.id
-            return Response(request.data, status=status.HTTP_201_CREATED)
+            serializer = self.get_serializer(result)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response({'Ошибка': 'вы уже добавили в избранное'})
 
 
 class NewsViewSet(generics.ListAPIView):
     '''Представление для отображение активных новостей'''
     queryset = NewsModel.objects.filter(is_active=True).order_by('-date_pub')
+    permission_classes = (AllowAny,)
     serializer_class = NewsSerializer
 
 
@@ -256,8 +263,8 @@ class FavoriteArtistsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
                 {'ERROR': ARTISTS['no_artist']},
                 status=status.HTTP_400_BAD_REQUEST)
         user_artist = FavoriteArtistModel.objects.filter(
-                user=user, artist=artist
-            )
+            user=user, artist=artist
+        )
         if request.method == 'DELETE':
             if not user_artist.exists():
                 return Response(
