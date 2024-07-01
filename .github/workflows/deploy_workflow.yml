@@ -40,9 +40,9 @@ jobs:
       uses: docker/login-action@v1
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        password: ${{ secrets.DOCKER_PASSWORD }}  
 
-    - name: Push to DockerHub
+    - name: Push backend to DockerHub
       uses: docker/build-push-action@v2
       with:
         context: sagaart/
@@ -62,8 +62,9 @@ jobs:
           passphrase: ${{ secrets.PASSPHRASE }}
           script: |
             sudo docker pull hackathonsagaart/sagaart_backend:hackathon
+            sudo docker pull hackathonsagaart/sagaart_frontend:hackathon
             sudo docker compose stop
-            sudo docker compose rm backend
+            sudo docker compose rm backend frontend
             echo DEBUG=${{ secrets.DEBUG }} > .env
             echo ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }} >> .env
             echo DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }} >> .env
