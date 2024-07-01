@@ -2,6 +2,8 @@
 
 Сервис оценки арт-объектов современного искусства на основе анализа больших данных с помощью авторского алгоритма.
 
+Проект доступен по адресу [http://158.160.134.225/](http://158.160.134.225/)
+
 ![example workflow](https://github.com/jullitka/sagaart_backend/actions/workflows/deploy_workflow.yml/badge.svg)
 
 
@@ -16,6 +18,7 @@
 [![Nginx](https://img.shields.io/badge/-NGINX-464646?style=flat-square&logo=NGINX)](https://nginx.org/ru/)
 [![gunicorn](https://img.shields.io/badge/-gunicorn-464646?style=flat-square&logo=gunicorn)](https://gunicorn.org/)
 [![GitHub%20Actions](https://img.shields.io/badge/-GitHub%20Actions-464646?style=flat-square&logo=GitHub%20actions)](https://github.com/features/actions)
+
 
 
 ## Команда разработчиков:
