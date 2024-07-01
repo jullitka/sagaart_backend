@@ -13,7 +13,7 @@ services:
   frontend:
     image: hackathonsagaart/sagaart_frontend:hackathon
     volumes:
-      - frontend/:/app/result_build/
+      - ../frontend/:/app/result_build/
     depends_on:
       - backend
 
