@@ -9,7 +9,9 @@ from rest_framework import serializers
 import base64
 
 from market.models import NewsModel
-from artworks.models import ArtistModel, ArtworkModel, FavoriteArtworkModel, StyleModel, ArtworkPriceModel
+from artworks.models import (ArtistModel, ArtworkModel,
+                             FavoriteArtworkModel, StyleModel,
+                             ArtworkPriceModel)
 from users.models import Subscribe, UserSubscribe
 from artists.models import FavoriteArtistModel
 
@@ -119,7 +121,7 @@ class ArtListSerializer(serializers.ModelSerializer):
     description = serializers.CharField()
     series = serializers.CharField()
     imageUrl = Base64ImageField(source='image')
-    
+
     class Meta:
         model = ArtworkModel
         fields = FIELDS_FOR_ART_OBJECTS

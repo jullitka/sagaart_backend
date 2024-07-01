@@ -13,7 +13,8 @@ from rest_framework import filters, generics, status, viewsets, mixins
 from drf_spectacular.utils import extend_schema_view
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import (IsAuthenticated, AllowAny,
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 
 from algorithm.estimation import estimation, get_data
@@ -22,6 +23,7 @@ from api.constants import (ARTVORK_API_SCHEMA_EXTENSIONS,
                            ARTVORKS_API_SCHEMA_EXTENSIONS,
                            FAVORIRE_ARTIST_API_SCHEMA_EXTENSIONS,
                            FAVORITE_ARTVORK_API_SCHEMA_EXTENSIONS,
+                           NEWS_API_SCHEMA_EXTENSIONS,
                            SUBSCRIPTION_API_SCHEMA_EXTENSIONS,
                            USER_API_SCHEMA_EXTENSIONS)
 
@@ -40,6 +42,7 @@ from api.serializers import NewsSerializer
 SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
 PERMISSIONS_USER = ['me', 'subscribe', 'my_subscription']
 User = get_user_model()
+
 
 @extend_schema_view(**SUBSCRIPTION_API_SCHEMA_EXTENSIONS)
 class SubscribeViewSet(viewsets.ReadOnlyModelViewSet):
@@ -167,11 +170,14 @@ class PaintingsAPIView(generics.ListCreateAPIView):
                 # получение цены с помощью алгоритма оценки
                 data_for_estimate = get_data(
                     category=None, year=data['year'],
-                    dimensions=data['size'], materials=data['brushstrokes_material'],
+                    dimensions=data['size'],
+                    materials=data['brushstrokes_material'],
                     author_name=data['artist']
                 )
                 price = estimation(data_for_estimate)
-                ArtworkPriceModel.objects.create(artwork=art, original_price=price)
+                ArtworkPriceModel.objects.create(
+                    artwork=art, original_price=price
+                )
                 art.is_estimate = True
                 art.save()
             except:
@@ -191,7 +197,7 @@ class PaintingsAPIView(generics.ListCreateAPIView):
             data=(request.data,),
             status=status.HTTP_201_CREATED
         )
-    
+
 
 @extend_schema_view(**ARTVORK_API_SCHEMA_EXTENSIONS)
 class RetrieveArtObject(generics.RetrieveDestroyAPIView):
@@ -212,6 +218,7 @@ class RetrieveArtObject(generics.RetrieveDestroyAPIView):
                 'Ошибка': 'Невозможно удалить чужой объект'
             }, status=status.HTTP_400_BAD_REQUEST
         )
+
 
 @extend_schema_view(**FAVORITE_ARTVORK_API_SCHEMA_EXTENSIONS)
 class FavoriteArt(viewsets.ModelViewSet):
@@ -254,6 +261,7 @@ class FavoriteArt(viewsets.ModelViewSet):
         return Response({'Ошибка': 'вы уже добавили в избранное'})
 
 
+@extend_schema_view(**NEWS_API_SCHEMA_EXTENSIONS)
 class NewsViewSet(generics.ListAPIView):
     '''Представление для отображение активных новостей'''
     queryset = NewsModel.objects.filter(is_active=True).order_by('-date_pub')
