@@ -119,6 +119,7 @@ class ArtListSerializer(serializers.ModelSerializer):
     description = serializers.CharField()
     series = serializers.CharField()
     imageUrl = Base64ImageField(source='image')
+    
     class Meta:
         model = ArtworkModel
         fields = FIELDS_FOR_ART_OBJECTS
