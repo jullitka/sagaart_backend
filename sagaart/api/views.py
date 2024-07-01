@@ -36,7 +36,7 @@ from artists.models import SeriesModel, FavoriteArtistModel
 from artworks.models import (ArtistModel, ArtworkModel, ArtworkPriceModel,
                              FavoriteArtworkModel, StyleModel)
 from users.models import Subscribe, UserSubscribe
-from market.models import NewsModel
+from news.models import NewsModel
 from api.serializers import NewsSerializer
 
 SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
