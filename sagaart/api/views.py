@@ -34,6 +34,7 @@ from api.utils import get_object_by_filter
 from artists.models import SeriesModel, FavoriteArtistModel
 from artworks.models import (ArtistModel, ArtworkModel, ArtworkPriceModel,
                              FavoriteArtworkModel, StyleModel)
+from algorithm.estimation import estimation
 from users.models import Subscribe, UserSubscribe
 from market.models import NewsModel
 from api.serializers import NewsSerializer
@@ -136,6 +137,7 @@ class PaintingsAPIView(generics.ListCreateAPIView):
         'brushstrokes_material', 'size', 'decoration',
         'orientation', 'style', 'author')  # price
     search_fields = ('name',)
+    http_method_names = ['get', 'delete']
 
     def post(self, request, *args, **kwargs):
         data = request.data
@@ -213,18 +215,38 @@ class RetrieveArtObject(generics.RetrieveDestroyAPIView):
                 'Ошибка': 'Невозможно удалить чужой объект'
             }, status=status.HTTP_400_BAD_REQUEST
         )
-    
+
 
 class TestArtworkViewSet(viewsets.ModelViewSet):
-    queryset = ArtworkModel.objects.all()
+    queryset = ArtworkModel.objects.filter(is_on_sold='on sale')
     serializer_class = TestArtWrokSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly, )
+    pagination_class = LimitOffsetPagination
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
+    filterset_fields = (
+        'brushstrokes_material', 'size', 'decoration',
+        'orientation', 'style', 'author')  # price
+    search_fields = ('name',)
+    http_method_names = ['post']
+    
+    def list(self, request):
+        result = self.queryset
+        serializer = ArtListSerializer(result, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @action(['get'],True)
+    def get(self, request):
+        print(request.data)
+        result= self.queryset.first()
+        serializer = ArtObjectSerializer(result, many=True)
+        #result = self.queryset.filter()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
     def perform_create(self, serializer):
         return serializer.save(
-            user = self.request.user 
+            user=self.request.user
         )
-    
 
 
 @extend_schema_view(**FAVORITE_ARTVORK_API_SCHEMA_EXTENSIONS)
