@@ -85,9 +85,18 @@ SUBSCRIPTION_API_SCHEMA_EXTENSIONS = {
 
 
 FAVORITE_ARTVORK_API_SCHEMA_EXTENSIONS = {
-    'get_list': extend_schema(
+    'list': extend_schema(
         tags=['Произведения искусства'],
-        summary="Получение списка всех произведений искусств, находящихся на продаже")
+        summary="Получение списка всех произведений искусств, находящихся на продаже"),
+    'retrieve': extend_schema(
+        tags=['Произведения искусства'],
+        summary="Получение информации о выбранном произведении из избранного"),
+    'destroy': extend_schema(
+        tags=['Произведения искусства'],
+        summary="Удаление произведения искусства из избранного"),
+    'create': extend_schema(
+        tags=['Произведения искусства'],
+        summary="Добавление произведения искусства в избранное"),
 }
 
 ARTVORK_API_SCHEMA_EXTENSIONS = {
