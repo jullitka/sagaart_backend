@@ -8,7 +8,7 @@ from drf_spectacular.utils import extend_schema_view
 from rest_framework import filters, generics, status, viewsets, mixins
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import (IsAuthenticated,
+from rest_framework.permissions import (IsAuthenticated, AllowAny,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 
@@ -34,7 +34,6 @@ from artworks.models import (ArtistModel, ArtworkModel, ArtworkPriceModel,
                              FavoriteArtworkModel, StyleModel)
 from algorithm.estimation import estimation, get_data
 from users.models import Subscribe, UserSubscribe
-from market.models import NewsModel
 from api.serializers import NewsSerializer
 from django.core.mail import send_mail
 
@@ -262,9 +261,19 @@ class RetrieveArtObject(generics.RetrieveUpdateDestroyAPIView):
 class TestArtworkViewSet(viewsets.ModelViewSet):
     queryset = ArtworkModel.objects.filter(is_on_sold='on sale')
     serializer_class = TestArtWrokSerializer
+    pagination_class = LimitOffsetPagination
     permission_classes = (IsAuthenticatedOrReadOnly,)
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
+    filterset_fields = (
+        'brushstrokes_material', 'size', 'decoration',
+        'orientation', 'style', 'author')
+    search_fields = ('name',)
     http_method_names = ['post']
 
+    def list(self, request):
+        result = self.queryset
+        serializer = ArtListSerializer(result, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
   #  filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
   #  filterset_fields = (

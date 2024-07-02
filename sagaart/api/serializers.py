@@ -8,11 +8,12 @@ from requests import Response
 from rest_framework import serializers, status
 import numpy as np
 from catboost import CatBoostRegressor
-from market.models import NewsModel
+from news.models import NewsModel
 from artworks.models import (ArtistModel, ArtworkModel, FavoriteArtworkModel,
                              StyleModel, ArtworkPriceModel, SeriesModel,
                              CategoryModel)
 from algorithm.estimation import estimation, get_author_data, get_data
+from api.constants import FIELDS_FOR_ART_OBJECTS
 from sagaart.settings import BASE_DIR
 from users.models import Subscribe, UserSubscribe
 from artists.models import FavoriteArtistModel
