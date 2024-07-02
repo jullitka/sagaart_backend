@@ -10,7 +10,7 @@ __pycache__/
  */artworks/migrations/
  */market/migrations/
  */media-back/
- */news/
+ */news/migrations/
 # *Dockerfile
 # C extensions
 *.so
