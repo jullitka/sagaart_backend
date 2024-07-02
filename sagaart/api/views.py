@@ -1,8 +1,9 @@
 import datetime as dt
 
+from djoser.conf import settings
 from django.contrib.auth import get_user_model
 from django_filters.rest_framework import DjangoFilterBackend
-from djoser.conf import settings
+from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
 
 
@@ -230,12 +231,12 @@ class TestArtworkViewSet(viewsets.ModelViewSet):
         'orientation', 'style', 'author')  # price
     search_fields = ('name',)
     http_method_names = ['post']
-    
+
     def list(self, request):
         result = self.queryset
         serializer = ArtListSerializer(result, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
     @action(['get'],True)
     def get(self, request):
         print(request.data)
@@ -243,7 +244,6 @@ class TestArtworkViewSet(viewsets.ModelViewSet):
         serializer = ArtObjectSerializer(result, many=True)
         #result = self.queryset.filter()
         return Response(serializer.data, status=status.HTTP_200_OK)
-
 
     def perform_create(self, serializer):
         return serializer.save(
@@ -265,9 +265,12 @@ class FavoriteArt(viewsets.ModelViewSet):
         )
         if destroy:
             destroy.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response(
+                {'Ошибка': 'В избранном нет такого произведения'},
+                status=status.HTTP_204_NO_CONTENT
+            )
         return Response(
-            {'Ошибка': 'нет такой подписки'},
+            {'Ошибка': 'В избранном нет такого произведения'},
             status=status.HTTP_400_BAD_REQUEST
         )
 

@@ -17,7 +17,6 @@ v1_router.register(r'delivery', DeliveryViewSet, basename='delivery')
 v1_router.register(
     r'favorite_artists', FavoriteArtistsViewSet, basename='favorite_artists'
 )
-
 v2_router = routers.SimpleRouter()
 v2_router.register(r'artwork', TestArtworkViewSet, basename='test_artwork')
 
