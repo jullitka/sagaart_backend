@@ -124,7 +124,8 @@ class ArtListSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source='user.email', write_only=True)
     description = serializers.CharField()
     series = serializers.CharField()
-    imageUrl = Base64ImageField(source='image')
+    # imageUrl = Base64ImageField(source='image')
+    imageUrl = serializers.CharField(source='image')
     original_price = serializers.SerializerMethodField()
     poster_price = serializers.SerializerMethodField()
 
@@ -140,7 +141,7 @@ class ArtListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ArtworkModel
-        fields = FIELDS_FOR_ART_OBJECTS+('original_price','poster_price')
+        fields = FIELDS_FOR_ART_OBJECTS+('original_price', 'poster_price')
         extra_kwargs = {
             'price': {'read_only': True},
         }

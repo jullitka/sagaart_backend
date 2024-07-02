@@ -1,9 +1,6 @@
 import datetime as dt
 
-import django.db.models.deletion
 from django.contrib.auth import get_user_model
-from django.db.models import F
-from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.conf import settings
 from djoser.views import UserViewSet
@@ -17,7 +14,6 @@ from rest_framework.permissions import (IsAuthenticated, AllowAny,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 
-#from algorithm.estimation import estimation, get_data
 from api.messages import SUBSCRIPTIONS, ARTISTS
 from api.constants import (ARTVORK_API_SCHEMA_EXTENSIONS,
                            ARTVORKS_API_SCHEMA_EXTENSIONS,
@@ -36,7 +32,7 @@ from api.utils import get_object_by_filter
 from artists.models import SeriesModel, FavoriteArtistModel
 from artworks.models import (ArtistModel, ArtworkModel, ArtworkPriceModel,
                              FavoriteArtworkModel, StyleModel)
-from algorithm.estimation import estimation
+from algorithm.estimation import estimation, get_data
 from users.models import Subscribe, UserSubscribe
 from market.models import NewsModel
 from api.serializers import NewsSerializer
@@ -253,7 +249,6 @@ class TestArtworkViewSet(viewsets.ModelViewSet):
         return serializer.save(
             user=self.request.user
         )
-
 
 
 @extend_schema_view(**FAVORITE_ARTVORK_API_SCHEMA_EXTENSIONS)
