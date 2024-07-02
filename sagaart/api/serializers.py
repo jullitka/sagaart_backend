@@ -1,24 +1,20 @@
 import base64
 import django.contrib.auth.password_validation as validators
+import numpy as np
+import re
 from django.contrib.auth import get_user_model
 from django.core import exceptions
 from django.core.files.base import ContentFile
+from rest_framework import serializers
 
-from requests import Response
-from rest_framework import serializers, status
-import numpy as np
-from catboost import CatBoostRegressor
-from news.models import NewsModel
+from api.constants import FIELDS_FOR_ART_OBJECTS
+from artists.models import FavoriteArtistModel
 from artworks.models import (ArtistModel, ArtworkModel, FavoriteArtworkModel,
                              StyleModel, ArtworkPriceModel, SeriesModel,
                              CategoryModel)
-from algorithm.estimation import estimation, get_author_data, get_data
-from api.constants import FIELDS_FOR_ART_OBJECTS
-from sagaart.settings import BASE_DIR
+from news.models import NewsModel
 from users.models import Subscribe, UserSubscribe
-from artists.models import FavoriteArtistModel
-from algorithm.Paintings_v2 import preprocess
-import re
+
 
 User = get_user_model()
 
@@ -191,14 +187,17 @@ class ArtObjectSerializer(ArtListSerializer):
         model = ArtworkModel
         fields = (
             FIELDS_FOR_ART_OBJECTS
-            + ('about_author', 'author_name', 'author_photo', 'author_user_id')+('original_price','poster_price')
-        )+('to_review',)
+            + (
+                'about_author', 'author_name', 'author_photo', 'author_user_id'
+            ) + ('original_price', 'poster_price')
+        ) + ('to_review',)
         read_only_fields = (
             FIELDS_FOR_ART_OBJECTS
-            + ('about_author', 'author_name', 'author_photo', 'author_user_id')+('original_price','poster_price')
+            + (
+                'about_author', 'author_name', 'author_photo', 'author_user_id'
+            ) + ('original_price', 'poster_price')
 
         )
-        
 
 
 class ArtPriceSerializer(serializers.ModelSerializer):
@@ -387,8 +386,3 @@ class TestArtWrokSerializer(serializers.ModelSerializer):
             if len(res) == 2:
                 return size
         return None
-
-      #  price = estimation(data=data)
-      #  self.initial_data['original_price'] = price
-      #  return price
-

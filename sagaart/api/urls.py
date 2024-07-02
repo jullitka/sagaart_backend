@@ -16,14 +16,16 @@ v1_router.register(r'delivery', DeliveryViewSet, basename='delivery')
 v1_router.register(
     r'favorite_artists', FavoriteArtistsViewSet, basename='favorite_artists'
 )
+
 v2_router = routers.SimpleRouter()
-v2_router.register(r'artwork', TestArtworkViewSet, basename='test_artwork')
+v2_router.register(r'artworks', TestArtworkViewSet, basename='test_artwork')
 
 urlpatterns = [
     path('v1/', include(v1_router.urls)),
-    path('v2/', include(v2_router.urls)),
     path(
-        'v1/artworks/', PaintingsAPIView.as_view(), name='paintings'
+        'v1/artworks/',
+        PaintingsAPIView.as_view(),
+        name='paintings'
     ),
     path('v1/news/', NewsViewSet.as_view(), name='news'),
     path('v1/artworks/<int:pk>', RetrieveArtObject.as_view()),
@@ -38,4 +40,5 @@ urlpatterns = [
         ),
         name='favorite_arts'
     ),
+    path('v2/', include(v2_router.urls)),
 ]

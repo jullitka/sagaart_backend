@@ -8,7 +8,7 @@ from drf_spectacular.utils import extend_schema_view
 from rest_framework import filters, generics, status, viewsets, mixins
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import (IsAuthenticated, AllowAny,
+from rest_framework.permissions import (AllowAny, IsAuthenticated, 
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 
@@ -19,7 +19,6 @@ from api.constants import (ARTVORK_API_SCHEMA_EXTENSIONS,
                            FAVORITE_ARTVORK_API_SCHEMA_EXTENSIONS,
                            NEWS_API_SCHEMA_EXTENSIONS,
                            PERMISSIONS_USER,
-                           SAFE_METHODS,
                            SUBSCRIPTION_API_SCHEMA_EXTENSIONS,
                            USER_API_SCHEMA_EXTENSIONS)
 from api.messages import SUBSCRIPTIONS, ARTISTS
@@ -35,7 +34,6 @@ from artworks.models import (ArtistModel, ArtworkModel, ArtworkPriceModel,
 from algorithm.estimation import estimation, get_data
 from users.models import Subscribe, UserSubscribe
 from api.serializers import NewsSerializer
-from django.core.mail import send_mail
 
 from news.models import NewsModel
 
@@ -138,7 +136,7 @@ class PaintingsAPIView(generics.ListCreateAPIView):
         'brushstrokes_material', 'size', 'decoration',
         'orientation', 'style', 'author')  # price
     search_fields = ('name',)
-    http_method_names = ['get', 'delete']
+    http_method_names = ['get', 'post']
 
     def post(self, request, *args, **kwargs):
         data = request.data
@@ -168,39 +166,35 @@ class PaintingsAPIView(generics.ListCreateAPIView):
                 series=series
             )
 
-    #        try:
-    #            # получение цены с помощью алгоритма оценки
-    #            data_for_estimate = get_data(
-    #                category=None, year=data['year'],
-    #                dimensions=data['size'],
-    #                materials=data['brushstrokes_material'],
-    #                author_name=data['artist']
-    #            )
-    #            price = estimation(data_for_estimate)
-    #            ArtworkPriceModel.objects.create(
-    #                artwork=art, original_price=price
-    #            )
-    #            art.is_estimate = True
-    #            art.save()
-    #        except Exception:
-    #            return Response(
-    #                {"Алгоритм оценки временно не работает,работа сохранена в базе без оценки"},
-    #                status=status.HTTP_201_CREATED
-    #            )
-
-
-            # price = ArtworkPriceModel.objects.filter(artwork=art)
-            # art.price = price
+            try:
+                # получение цены с помощью алгоритма оценки
+                data_for_estimate = get_data(
+                    category=None, year=data['year'],
+                    dimensions=data['size'],
+                    materials=data['brushstrokes_material'],
+                    author_name=data['artist']
+                )
+                price = estimation(data_for_estimate)
+                ArtworkPriceModel.objects.create(
+                    artwork=art, original_price=price
+                )
+                art.is_estimate = True
+                art.save()
+            except Exception:
+                return Response(
+                    {"Алгоритм оценки временно не работает,работа сохранена в базе без оценки"},
+                    status=status.HTTP_201_CREATED
+                )
         except Exception as er:
             return Response(
                 {'Ошибка': f' Нет поля {er}'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        #send_mail(subject='вы создали', message='aaaa', from_email=None, recipient_list=('@gmail.com',))
         return Response(
             data=(request.data,),
             status=status.HTTP_201_CREATED
         )
+
 
 @extend_schema_view(**ARTVORK_API_SCHEMA_EXTENSIONS)
 class RetrieveArtObject(generics.RetrieveUpdateDestroyAPIView):
@@ -274,26 +268,6 @@ class TestArtworkViewSet(viewsets.ModelViewSet):
         result = self.queryset
         serializer = ArtListSerializer(result, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-  #  filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
-  #  filterset_fields = (
-  #      'brushstrokes_material', 'size', 'decoration',
-  #      'orientation', 'style', 'author')
-  #  search_fields = ('name',)
-  #  http_method_names = ['post']
-
-  #  def list(self, request):
-  #      result = self.queryset
-  #      serializer = ArtListSerializer(result, many=True)
-  #      return Response(serializer.data, status=status.HTTP_200_OK)
-
-  #  @action(['get'], True)
-  #  def get(self, request):
-  #      print(request.data)
-  #      result = self.queryset.first()
-  #      serializer = ArtObjectSerializer(result, many=True)
-  #      return Response(serializer.data, status=status.HTTP_200_OK)
-
 
     def perform_create(self, serializer):
         return serializer.save(
