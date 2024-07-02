@@ -7,7 +7,6 @@ from .market_views import DeliveryViewSet, OrdersViewSet, ShoppingCartViewSet
 from .views import PaintingsAPIView, RetrieveArtObject, FavoriteArtistsViewSet
 
 
-
 v1_router = routers.SimpleRouter()
 
 v1_router.register(
@@ -15,7 +14,9 @@ v1_router.register(
 )
 v1_router.register(r'orders', OrdersViewSet, basename='orders')
 v1_router.register(r'delivery', DeliveryViewSet, basename='delivery')
-v1_router.register(r'favorite_artists', FavoriteArtistsViewSet, basename='favorite_artists')
+v1_router.register(
+    r'favorite_artists', FavoriteArtistsViewSet, basename='favorite_artists'
+)
 
 v2_router = routers.SimpleRouter()
 v2_router.register(r'artwork', TestArtworkViewSet, basename='test_artwork')

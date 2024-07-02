@@ -1,9 +1,6 @@
 import base64
-import django.db
-from catboost import CatBoostRegressor
 import django.contrib.auth.password_validation as validators
 from django.contrib.auth import get_user_model
-import numpy as np
 from django.core import exceptions
 from django.core.files.base import ContentFile
 from rest_framework import serializers
@@ -11,12 +8,10 @@ from rest_framework import serializers
 
 from news.models import NewsModel
 from artists.models import FavoriteArtistModel
-from artworks.models import (ArtistModel, ArtworkModel, ArtworkPriceModel, 
+from artworks.models import (ArtistModel, ArtworkModel, ArtworkPriceModel,
                              CategoryModel, FavoriteArtworkModel,
                              StyleModel, SeriesModel)
-from algorithm.estimation import estimation, get_author_data, get_data
-from algorithm.Paintings_v2 import preprocess
-from sagaart.settings import BASE_DIR
+from algorithm.estimation import estimation, get_data
 from users.models import Subscribe, UserSubscribe
 
 
@@ -125,8 +120,8 @@ class ArtListSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source='user.email', write_only=True)
     description = serializers.CharField()
     series = serializers.CharField()
-    # imageUrl = Base64ImageField(source='image')
-    imageUrl = serializers.CharField(source='image')
+    imageUrl = Base64ImageField(source='image')
+    # imageUrl = serializers.CharField(source='image')
     original_price = serializers.SerializerMethodField()
     poster_price = serializers.SerializerMethodField()
 
@@ -142,7 +137,7 @@ class ArtListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ArtworkModel
-        fields = FIELDS_FOR_ART_OBJECTS+('original_price', 'poster_price')
+        fields = FIELDS_FOR_ART_OBJECTS + ('original_price', 'poster_price')
         extra_kwargs = {
             'price': {'read_only': True},
         }
@@ -186,7 +181,9 @@ class ArtObjectSerializer(ArtListSerializer):
         model = ArtworkModel
         fields = (
             FIELDS_FOR_ART_OBJECTS
-            + ('about_author', 'author_name', 'author_photo', 'author_user_id')+('original_price','poster_price')
+            + (
+                'about_author', 'author_name', 'author_photo', 'author_user_id'
+            ) + ('original_price', 'poster_price')
         )
 
 
@@ -260,6 +257,8 @@ class FavoriteSerializer(serializers.ModelSerializer):
 """
 Группа сериализаторов для эндпоинтов v2
 """
+
+
 class TestArtistModelSerializer(serializers.ModelSerializer):
     artist_id = serializers.IntegerField(source='id', read_only=True)
 
@@ -278,10 +277,12 @@ class CategorySerializer(serializers.ModelSerializer):
         model = CategoryModel
         fields = ('name', )
 
+
 class SeriesSerializer(serializers.ModelSerializer):
     class Meta:
         model = SeriesModel
         fields = ('name', )
+
 
 class TestArtWrokSerializer(serializers.ModelSerializer):
     author = TestArtistModelSerializer()
@@ -316,11 +317,9 @@ class TestArtWrokSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
-        '''
-            При создании вытаскивает стиль и серию если поля незаполнены
-            выставляет null, в ином случае либо достает данные(стиля, серии)из бд
-            либо создает новые
-        '''
+        """ При создании вытаскивает стиль и серию если поля незаполнены
+        выставляет null, в ином случае либо достает данные
+        (стиля, серии) из бд либо создает новые."""
 
         style = validated_data.pop('style')
         series = validated_data.pop('series')
@@ -335,11 +334,11 @@ class TestArtWrokSerializer(serializers.ModelSerializer):
                 **style
             )
             artwork.style = current_style
-        price = ArtworkPriceModel.objects.create(
-            artwork=artwork,
-            original_price=self.data['original_price'],
-            copy_price=None
-        )
+            ArtworkPriceModel.objects.create(
+                artwork=artwork,
+                original_price=self.data['original_price'],
+                copy_price=None
+            )
         return artwork
 
     def validate_category(self, category):

@@ -3,7 +3,8 @@ import numpy as np
 
 from artists.models import ArtistModel, ExhibitionParticipantModel
 from .constants import MODEL_PATH
-try:    
+# на случай, если алгоритм не найден
+try:
     from .Paintings_v2 import preprocess
 except ModuleNotFoundError:
     print('Отсутствует модуль Paintings_v2')
@@ -44,6 +45,3 @@ def estimation(data, model_path=MODEL_PATH):
     model = CatBoostRegressor()
     model.load_model(fname=model_path, format="json")
     return np.clip(model.predict(preprocess(data)), 1000, np.inf)
-
-
-# print(get_author_data("Вася Пупкин"))
