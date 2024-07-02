@@ -25,7 +25,7 @@ urlpatterns = [
     path(
         'v1/artworks/', PaintingsAPIView.as_view(), name='paintings'
     ),
-    path('v1/news/', NewsViewSet.as_view()),
+    path('v1/news/', NewsViewSet.as_view(), name='news'),
     path('v1/artworks/<int:pk>', RetrieveArtObject.as_view()),
     path(
         'v1/artworks/favorite_arts/',
