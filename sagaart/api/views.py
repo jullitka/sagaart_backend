@@ -35,7 +35,6 @@ from artworks.models import (ArtistModel, ArtworkModel, ArtworkPriceModel,
 from news.models import NewsModel
 from users.models import Subscribe, UserSubscribe
 
-from api.serializers import NewsSerializer
 
 User = get_user_model()
 

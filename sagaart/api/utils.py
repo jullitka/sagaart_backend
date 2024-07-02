@@ -1,5 +1,4 @@
 def get_object_by_filter(model, search, param):
-    result = model.objects.filter(
+    return rmodel.objects.filter(
         name=param
     ).first()
-    return result

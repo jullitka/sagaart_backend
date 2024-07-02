@@ -247,10 +247,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
         )
 
 
-
-"""
-Группа сериализаторов для эндпоинтов v2
-"""
+"""Группа сериализаторов для эндпоинтов v2"""
 
 
 class TestArtistModelSerializer(serializers.ModelSerializer):
