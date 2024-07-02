@@ -2,7 +2,7 @@ from django.urls import include, path
 from djoser.views import TokenCreateView, TokenDestroyView
 from rest_framework import routers
 
-from api.views import MainUserViewSet, SubscribeViewSet
+from api.users_views import MainUserViewSet, SubscribeViewSet
 
 v1_router = routers.DefaultRouter()
 
