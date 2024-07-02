@@ -117,6 +117,7 @@ class ArtListSerializer(serializers.ModelSerializer):
     imageUrl = Base64ImageField(source='image')
     original_price = serializers.SerializerMethodField()
     poster_price = serializers.SerializerMethodField()
+    is_favorite = serializers.SerializerMethodField()
 
     def get_original_price(self, obj):
         result = ArtworkPriceModel.objects.filter(artwork=obj.id).first()
@@ -128,9 +129,19 @@ class ArtListSerializer(serializers.ModelSerializer):
         serializer = ArtPriceSerializer(result)
         return (serializer.data['copy_price'])
 
+    def get_is_favorite(self, obj):
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return FavoriteArtworkModel.objects.filter(
+                artwork=obj, user=request.user
+            ).exists()
+        return False
+
     class Meta:
         model = ArtworkModel
-        fields = FIELDS_FOR_ART_OBJECTS + ('original_price', 'poster_price')
+        fields = FIELDS_FOR_ART_OBJECTS + (
+            'original_price', 'poster_price', 'is_favorite'
+        )
         extra_kwargs = {
             'price': {'read_only': True},
         }
