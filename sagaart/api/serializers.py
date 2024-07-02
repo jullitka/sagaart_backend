@@ -323,6 +323,7 @@ class TestArtWrokSerializer(serializers.ModelSerializer):
 
         style = validated_data.pop('style')
         series = validated_data.pop('series')
+        print(validated_data)
         artwork = ArtworkModel.objects.create(**validated_data)
         if series:
             current_series, _ = SeriesModel.objects.get_or_create(
