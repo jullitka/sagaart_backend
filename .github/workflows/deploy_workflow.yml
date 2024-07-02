@@ -64,7 +64,8 @@ jobs:
             sudo docker pull hackathonsagaart/sagaart_backend:hackathon
             sudo docker pull hackathonsagaart/sagaart_frontend:hackathon
             sudo docker compose stop
-            sudo docker compose rm backend frontend
+            sudo docker compose rm backend
+            sudo docker compose rm frontend
             echo DEBUG=${{ secrets.DEBUG }} > .env
             echo ALLOWED_HOSTS=${{ secrets.ALLOWED_HOSTS }} >> .env
             echo DJANGO_SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }} >> .env
