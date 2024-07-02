@@ -1,50 +1,48 @@
 import datetime as dt
 
-from djoser.conf import settings
 from django.contrib.auth import get_user_model
 from django_filters.rest_framework import DjangoFilterBackend
-from django.shortcuts import get_object_or_404
+from djoser.conf import settings
 from djoser.views import UserViewSet
-
-
-from rest_framework import filters, generics, status, viewsets, mixins
 from drf_spectacular.utils import extend_schema_view
+from rest_framework import filters, generics, status, viewsets, mixins
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import (IsAuthenticated, AllowAny,
+from rest_framework.permissions import (IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 
-from api.messages import SUBSCRIPTIONS, ARTISTS
+from algorithm.estimation import estimation, get_data
 from api.constants import (ARTVORK_API_SCHEMA_EXTENSIONS,
                            ARTVORKS_API_SCHEMA_EXTENSIONS,
                            FAVORIRE_ARTIST_API_SCHEMA_EXTENSIONS,
                            FAVORITE_ARTVORK_API_SCHEMA_EXTENSIONS,
                            NEWS_API_SCHEMA_EXTENSIONS,
+                           PERMISSIONS_USER,
+                           SAFE_METHODS,
                            SUBSCRIPTION_API_SCHEMA_EXTENSIONS,
                            USER_API_SCHEMA_EXTENSIONS)
-
-from api.permissions import IsAdminOrRead, IsOwnerProfile
+from api.messages import SUBSCRIPTIONS, ARTISTS
+from api.permissions import IsAdminOrRead
 from api.serializers import (ArtListSerializer, ArtObjectSerializer,
-                             SubscribeSerializer, SubscribeUserSerializer,
                              FavoriteSerializer, FavoriteArtworkSerializer,
-                             TestArtWrokSerializer)
+                             NewsSerializer, SubscribeSerializer,
+                             SubscribeUserSerializer, TestArtWrokSerializer)
 from api.utils import get_object_by_filter
 from artists.models import SeriesModel, FavoriteArtistModel
 from artworks.models import (ArtistModel, ArtworkModel, ArtworkPriceModel,
                              FavoriteArtworkModel, StyleModel)
-from algorithm.estimation import estimation, get_data
-from users.models import Subscribe, UserSubscribe
 from news.models import NewsModel
+from users.models import Subscribe, UserSubscribe
+
 from api.serializers import NewsSerializer
 
-SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
-PERMISSIONS_USER = ['me', 'subscribe', 'my_subscription']
 User = get_user_model()
 
 
 @extend_schema_view(**SUBSCRIPTION_API_SCHEMA_EXTENSIONS)
 class SubscribeViewSet(viewsets.ReadOnlyModelViewSet):
+    """Представление для подписок"""
     queryset = Subscribe.objects.all()
     serializer_class = SubscribeSerializer
 
@@ -100,7 +98,7 @@ class SubscribeViewSet(viewsets.ReadOnlyModelViewSet):
 
 @extend_schema_view(**USER_API_SCHEMA_EXTENSIONS)
 class MainUserViewSet(UserViewSet):
-    '''Представление функционала пользователя'''
+    """Представление функционала пользователя"""
     def get_permissions(self):
         if self.action in PERMISSIONS_USER:
             self.permission_classes = settings.PERMISSIONS.me
@@ -127,7 +125,7 @@ class MainUserViewSet(UserViewSet):
 
 @extend_schema_view(**ARTVORKS_API_SCHEMA_EXTENSIONS)
 class PaintingsAPIView(generics.ListCreateAPIView):
-    '''Представление для списка и создания арт-объекта'''
+    """Представление для списка и создания арт-объекта"""
     queryset = ArtworkModel.objects.filter(is_on_sold='on sale')
     serializer_class = ArtListSerializer
     pagination_class = LimitOffsetPagination
@@ -180,9 +178,9 @@ class PaintingsAPIView(generics.ListCreateAPIView):
                 )
                 art.is_estimate = True
                 art.save()
-            except:
+            except Exception:
                 return Response(
-                    {"Алгоритм оценки временно не работает, работа сохранена в базе без оценки"},
+                    {"Алгоритм оценки временно не работает,работа сохранена в базе без оценки"},
                     status=status.HTTP_201_CREATED
                 )
 
@@ -201,7 +199,7 @@ class PaintingsAPIView(generics.ListCreateAPIView):
 
 @extend_schema_view(**ARTVORK_API_SCHEMA_EXTENSIONS)
 class RetrieveArtObject(generics.RetrieveDestroyAPIView):
-    '''Представление для карточки арт-объекта'''
+    """Представление для карточки арт-объекта"""
     queryset = ArtworkModel.objects.all().select_related('author')
     serializer_class = ArtObjectSerializer
     pagination_class = LimitOffsetPagination
@@ -228,7 +226,7 @@ class TestArtworkViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
     filterset_fields = (
         'brushstrokes_material', 'size', 'decoration',
-        'orientation', 'style', 'author')  # price
+        'orientation', 'style', 'author')
     search_fields = ('name',)
     http_method_names = ['post']
 
@@ -237,12 +235,11 @@ class TestArtworkViewSet(viewsets.ModelViewSet):
         serializer = ArtListSerializer(result, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(['get'],True)
+    @action(['get'], True)
     def get(self, request):
         print(request.data)
-        result= self.queryset.first()
+        result = self.queryset.first()
         serializer = ArtObjectSerializer(result, many=True)
-        #result = self.queryset.filter()
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def perform_create(self, serializer):
@@ -297,13 +294,14 @@ class FavoriteArt(viewsets.ModelViewSet):
 
 @extend_schema_view(**NEWS_API_SCHEMA_EXTENSIONS)
 class NewsViewSet(generics.ListAPIView):
-    '''Представление для отображение активных новостей'''
+    """Представление для отображение активных новостей"""
     queryset = NewsModel.objects.filter(is_active=True).order_by('-date_pub')
     serializer_class = NewsSerializer
 
 
 @extend_schema_view(**FAVORIRE_ARTIST_API_SCHEMA_EXTENSIONS)
 class FavoriteArtistsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    """Представление для любимых авторов"""
     queryset = FavoriteArtistModel.objects.all()
     serializer_class = FavoriteSerializer
     permission_classes = [IsAuthenticated, ]
@@ -323,8 +321,8 @@ class FavoriteArtistsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
                 {'ERROR': ARTISTS['no_artist']},
                 status=status.HTTP_400_BAD_REQUEST)
         user_artist = FavoriteArtistModel.objects.filter(
-                user=user, artist=artist
-            )
+            user=user, artist=artist
+        )
         if request.method == 'DELETE':
             if not user_artist.exists():
                 return Response(

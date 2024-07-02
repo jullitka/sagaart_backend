@@ -1,10 +1,9 @@
 from django.urls import include, path
 from rest_framework import routers
 
-from api.views import FavoriteArt, PaintingsAPIView, RetrieveArtObject
-from api.views import NewsViewSet, TestArtworkViewSet
-from .market_views import DeliveryViewSet, OrdersViewSet, ShoppingCartViewSet
-from .views import PaintingsAPIView, RetrieveArtObject, FavoriteArtistsViewSet
+from api.market_views import DeliveryViewSet, OrdersViewSet, ShoppingCartViewSet
+from api.views import (FavoriteArt, FavoriteArtistsViewSet, NewsViewSet,
+                       PaintingsAPIView, RetrieveArtObject, TestArtworkViewSet)
 
 
 v1_router = routers.SimpleRouter()

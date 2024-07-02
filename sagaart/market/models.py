@@ -1,8 +1,8 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 
-from .constants import DELIVERY_TYPE_CHOICES, PAYMENT_METHOD_CHOICES
 from artworks.models import ArtworkModel
+from market.constants import DELIVERY_TYPE_CHOICES, PAYMENT_METHOD_CHOICES
 from users.models import User
 
 

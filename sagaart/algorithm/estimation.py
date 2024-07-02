@@ -1,14 +1,14 @@
-from catboost import CatBoostRegressor
 import numpy as np
+from catboost import CatBoostRegressor
 
 from artists.models import ArtistModel, ExhibitionParticipantModel
-from .constants import MODEL_PATH
+from algorithm.constants import MODEL_PATH
 # на случай, если алгоритм не найден
 try:
     from .Paintings_v2 import preprocess
 except ModuleNotFoundError:
     print('Отсутствует модуль Paintings_v2')
-from .processing_data import ProcessingArtworkDataToEstimate
+from algorithm.processing_data import ProcessingArtworkDataToEstimate
 
 
 def get_author_data(author_name):

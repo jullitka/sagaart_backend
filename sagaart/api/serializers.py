@@ -5,13 +5,13 @@ from django.core import exceptions
 from django.core.files.base import ContentFile
 from rest_framework import serializers
 
-
-from news.models import NewsModel
+from api.constants import FIELDS_FOR_ART_OBJECTS
 from artists.models import FavoriteArtistModel
 from artworks.models import (ArtistModel, ArtworkModel, ArtworkPriceModel,
                              CategoryModel, FavoriteArtworkModel,
-                             StyleModel, SeriesModel)
+                             SeriesModel, StyleModel)
 from algorithm.estimation import estimation, get_data
+from news.models import NewsModel
 from users.models import Subscribe, UserSubscribe
 
 
@@ -30,7 +30,7 @@ class Base64ImageField(serializers.ImageField):
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
-    '''Сериализатор создание пользователя'''
+    """Сериализатор создание пользователя"""
     password = serializers.CharField(write_only=True)
     phone_number = serializers.RegexField(
         regex=r'^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$',
@@ -69,7 +69,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
 
 class UserRetriveSerializer(serializers.ModelSerializer):
-    '''Сериализатор карточки юзера'''
+    """Сериализатор карточки юзера"""
     class Meta:
         model = User
         fields = [
@@ -84,12 +84,14 @@ class UserRetriveSerializer(serializers.ModelSerializer):
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
+    """Сериализатор подписки"""
     class Meta:
         model = Subscribe
         fields = '__all__'
 
 
 class SubscribeUserSerializer(serializers.ModelSerializer):
+    """Сериализатор подписок пользователей"""
     email = serializers.CharField(source='user_id.email')
     price = serializers.IntegerField(source='subscribe.price')
     sub_time = serializers.CharField(source='subscribe.sub_time')
@@ -104,16 +106,8 @@ class SubscribeUserSerializer(serializers.ModelSerializer):
         ]
 
 
-FIELDS_FOR_ART_OBJECTS = (
-    'title', 'artist', 'description', 'imageUrl',
-    'size', 'orientation', 'brushstrokes_material',
-    'style', 'decoration', 'year',
-    'series', 'author_signature', 'email', 'id'
-)
-
-
 class ArtListSerializer(serializers.ModelSerializer):
-    '''Сериализатор для каталога арт-объектов'''
+    """Сериализатор для каталога арт-объектов"""
     title = serializers.CharField(source='name')
     artist = serializers.CharField(source='author')
     year = serializers.CharField()
@@ -121,7 +115,6 @@ class ArtListSerializer(serializers.ModelSerializer):
     description = serializers.CharField()
     series = serializers.CharField()
     imageUrl = Base64ImageField(source='image')
-    # imageUrl = serializers.CharField(source='image')
     original_price = serializers.SerializerMethodField()
     poster_price = serializers.SerializerMethodField()
 
@@ -144,14 +137,14 @@ class ArtListSerializer(serializers.ModelSerializer):
 
 
 class AuthorSerializer(serializers.ModelSerializer):
-    '''Сериализатор автора произведения'''
+    """Сериализатор автора произведения"""
     class Meta:
         model = ArtistModel
         fields = ('id', 'name',)
 
 
 class ArtObjectSerializer(ArtListSerializer):
-    '''Сериализатор для карточки товара'''
+    """Сериализатор для карточки товара"""
     about_author = serializers.CharField(
         source='author.about_artist', read_only=True
     )
@@ -188,7 +181,7 @@ class ArtObjectSerializer(ArtListSerializer):
 
 
 class ArtPriceSerializer(serializers.ModelSerializer):
-    '''Сериализатор отображения цен для произведения'''
+    """Сериализатор отображения цен для произведения"""
     original_price = serializers.IntegerField()
     copy_price = serializers.IntegerField()
 
@@ -198,7 +191,7 @@ class ArtPriceSerializer(serializers.ModelSerializer):
 
 
 class FavoriteArtworkSerializer(serializers.ModelSerializer):
-    '''Сериализатор избранных произведений'''
+    """Сериализатор избранных произведений"""
     art_photo = serializers.ImageField(source='artwork.image')
     artist_name = serializers.CharField(source='artwork.author.name')
     art_name = serializers.CharField(source='artwork.name')
@@ -224,7 +217,7 @@ class FavoriteArtworkSerializer(serializers.ModelSerializer):
 
 
 class NewsSerializer(serializers.ModelSerializer):
-    '''Сериализатор новостей'''
+    """Сериализатор новостей"""
     date_pub = serializers.DateTimeField('%d.%m.%Y')
 
     class Meta:
@@ -240,7 +233,7 @@ class StyleSerializer(serializers.ModelSerializer):
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
-    '''Сериализатор для избранных авторов'''
+    """Сериализатор для избранных авторов"""
     name = serializers.CharField(source='artist.name')
     about_artist = serializers.CharField(source='artist.about_artist')
     imageUrl = Base64ImageField(source='artist.photo')
@@ -252,6 +245,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
             'about_artist',
             'imageUrl'
         )
+
 
 
 """

@@ -1,5 +1,14 @@
 from drf_spectacular.utils import extend_schema
 
+SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
+PERMISSIONS_USER = ['me', 'subscribe', 'my_subscription']
+
+FIELDS_FOR_ART_OBJECTS = (
+    'title', 'artist', 'description', 'imageUrl',
+    'size', 'orientation', 'brushstrokes_material',
+    'style', 'decoration', 'year',
+    'series', 'author_signature', 'email', 'id'
+)
 
 ORDER_API_SCHEMA_EXTENSIONS = {
     'list': extend_schema(

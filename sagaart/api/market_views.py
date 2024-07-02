@@ -1,18 +1,16 @@
-from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from drf_spectacular.utils import extend_schema_view
-from rest_framework import filters, mixins, viewsets, status
+from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
-from .constants import (DELIVERY_API_SCHEMA_EXTENSIONS,
-                        ORDER_API_SCHEMA_EXTENSIONS,
-                        SHOPPING_CART_API_SCHEMA_EXTENSIONS)
-from .market_serializers import (DeliverySerializer, OrderCreateSerializer,
-                                 ShoppingCartSerializer)
+from api.constants import (DELIVERY_API_SCHEMA_EXTENSIONS,
+                           ORDER_API_SCHEMA_EXTENSIONS,
+                           SHOPPING_CART_API_SCHEMA_EXTENSIONS)
+from api.market_serializers import (DeliverySerializer, OrderCreateSerializer,
+                                    ShoppingCartSerializer)
 from artworks.models import ArtworkModel
 from market.models import OrderModel, PurchaseModel, ShoppingCartModel
 

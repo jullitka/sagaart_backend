@@ -144,7 +144,7 @@ class ArtworkModel(models.Model):
 
     def __str__(self):
         return f'{self.name}, {self.author}'
-    
+
     def clean(self):
         super().clean()
         if not self.is_estimate and self.is_on_sold != 'not posted':
