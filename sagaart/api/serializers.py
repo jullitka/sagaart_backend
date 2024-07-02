@@ -13,10 +13,9 @@ from news.models import NewsModel
 from artists.models import FavoriteArtistModel
 from artworks.models import (ArtistModel, ArtworkModel, ArtworkPriceModel, 
                              CategoryModel, FavoriteArtworkModel,
-                             StyleModel,  SeriesModel)
+                             StyleModel, SeriesModel)
 from algorithm.estimation import estimation, get_author_data, get_data
 from algorithm.Paintings_v2 import preprocess
-from market.models import NewsModel
 from sagaart.settings import BASE_DIR
 from users.models import Subscribe, UserSubscribe
 

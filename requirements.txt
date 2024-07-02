@@ -32,7 +32,7 @@ jsonschema==4.22.0
 jsonschema-specifications==2023.12.1
 kiwisolver==1.4.5
 matplotlib==3.9.0
-numpy==1.26.4
+numpy==1.24.0
 oauthlib==3.2.2
 packaging==24.1
 pandas==2.2.2
