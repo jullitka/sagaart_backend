@@ -13,11 +13,22 @@ ORDER_API_SCHEMA_EXTENSIONS = {
         summary="Создание заказ"),
 }
 
-
 SHOPPING_CART_API_SCHEMA_EXTENSIONS = {
     'list': extend_schema(
         tags=['Корзина'],
-        summary="Получение содержимого корзины пользователем")
+        summary="Получение содержимого корзины пользователем"),
+    'add_copy_to_cart': extend_schema(
+        tags=['Корзина'],
+        summary="Добавление принта произведения в корзину"),
+    'add_original_to_cart': extend_schema(
+        tags=['Корзина'],
+        summary="Добавление оригинала работы в корзину"),
+    'remove_copy_from_cart': extend_schema(
+        tags=['Корзина'],
+        summary="Удаление принта произведения из корзину"),
+    'remove_original_from_cart': extend_schema(
+        tags=['Корзина'],
+        summary="Удаление оригинала произведения из корзину"),
 }
 
 DELIVERY_API_SCHEMA_EXTENSIONS = {
@@ -72,11 +83,36 @@ SUBSCRIPTION_API_SCHEMA_EXTENSIONS = {
         summary='Оформление и удаление подписки'),
 }
 
-FAVORITE_ART_API_SCHEMA_EXTENSIONS = {
-    'destroy': extend_schema(
-        tags=['Избранные арты'],
-        summary='Удаление избранного арта',
-        parameters=['artworks'],
-    ),
 
+FAVORITE_ARTVORK_API_SCHEMA_EXTENSIONS = {
+    'get_list': extend_schema(
+        tags=['Произведения искусства'],
+        summary="Получение списка всех произведений искусств, находящихся на продаже")
+}
+
+ARTVORK_API_SCHEMA_EXTENSIONS = {
+    'get': extend_schema(
+        tags=['Произведения искусства'],
+        summary="Получение информации о произведении искусства"),
+    'delete': extend_schema(
+        tags=['Произведения искусства'],
+        summary="Удаление произведения искусства из базы"),
+}
+
+ARTVORKS_API_SCHEMA_EXTENSIONS = {
+    'post': extend_schema(
+        tags=['Произведения искусства'],
+        summary="Добавление произведения искусства"),
+    'get': extend_schema(
+        tags=['Произведения искусства'],
+        summary="Получение списка произведений искусства, находящихся на продаже"),
+}
+
+FAVORIRE_ARTIST_API_SCHEMA_EXTENSIONS = {
+    'add_favorite': extend_schema(
+        tags=['Авторы'],
+        summary="Добавление в избранное авторов и удаление"),
+    'list': extend_schema(
+        tags=['Авторы'],
+        summary="Получение списка избранных авторов пользователя"),
 }
