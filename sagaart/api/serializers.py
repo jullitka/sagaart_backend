@@ -1,23 +1,22 @@
+import base64
 import django.db
-from django.contrib.auth import get_user_model
+from catboost import CatBoostRegressor
 import django.contrib.auth.password_validation as validators
+from django.contrib.auth import get_user_model
+import numpy as np
 from django.core import exceptions
 from django.core.files.base import ContentFile
-
 from rest_framework import serializers
 
-import base64
-import numpy as np
-from catboost import CatBoostRegressor
-from market.models import NewsModel
-from artworks.models import (ArtistModel, ArtworkModel, FavoriteArtworkModel,
-                             StyleModel, ArtworkPriceModel, SeriesModel,
-                             CategoryModel)
+from artists.models import FavoriteArtistModel
+from artworks.models import (ArtistModel, ArtworkModel, ArtworkPriceModel, 
+                             CategoryModel, FavoriteArtworkModel,
+                             StyleModel,  SeriesModel)
 from algorithm.estimation import estimation, get_author_data, get_data
+from algorithm.Paintings_v2 import preprocess
+from market.models import NewsModel
 from sagaart.settings import BASE_DIR
 from users.models import Subscribe, UserSubscribe
-from artists.models import FavoriteArtistModel
-from algorithm.Paintings_v2 import preprocess
 
 
 User = get_user_model()

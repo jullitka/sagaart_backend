@@ -85,9 +85,15 @@ SUBSCRIPTION_API_SCHEMA_EXTENSIONS = {
 
 
 FAVORITE_ARTVORK_API_SCHEMA_EXTENSIONS = {
-    'get_list': extend_schema(
+    'delete': extend_schema(
         tags=['Произведения искусства'],
-        summary="Получение списка всех произведений искусств, находящихся на продаже")
+        summary="Удаление произведения искусства из избранного"),
+    'post': extend_schema(
+        tags=['Произведения искусства'],
+        summary="Добавление произведения искусства в избранное"),
+    'list': extend_schema(
+        tags=['Произведения искусства'],
+        summary="Добавление произведения искусства в избранное"),
 }
 
 ARTVORK_API_SCHEMA_EXTENSIONS = {
@@ -109,10 +115,16 @@ ARTVORKS_API_SCHEMA_EXTENSIONS = {
 }
 
 FAVORIRE_ARTIST_API_SCHEMA_EXTENSIONS = {
-    'add_favorite': extend_schema(
-        tags=['Авторы'],
-        summary="Добавление в избранное авторов и удаление"),
     'list': extend_schema(
         tags=['Авторы'],
         summary="Получение списка избранных авторов пользователя"),
+    'edit_favorite': extend_schema(
+        tags=['Авторы'],
+        summary="Добавление автора в избранное/удаление из избранного")
+}
+
+NEWS_API_SCHEMA_EXTENSIONS = {
+    'get': extend_schema(
+        tags=['Новости'],
+        summary="Получение списка новостей")
 }

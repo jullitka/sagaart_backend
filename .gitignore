@@ -171,5 +171,7 @@ cython_debug/
 #.idea/
 
 # алгоритм оценки произведений
-*catboost_v1.json
-*Paintings_v2.py
+ *catboost_v1.json
+ *Paintings_v2.py
+
+# *frontend/
