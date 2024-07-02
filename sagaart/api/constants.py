@@ -97,6 +97,10 @@ ARTVORK_API_SCHEMA_EXTENSIONS = {
     'delete': extend_schema(
         tags=['Произведения искусства'],
         summary="Удаление произведения искусства из базы"),
+    'patch': extend_schema(
+        tags=['Произведения искусства'],
+        summary='Отправка произведения на оценку'
+    )
 }
 
 ARTVORKS_API_SCHEMA_EXTENSIONS = {
