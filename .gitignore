@@ -5,11 +5,12 @@ __pycache__/
 .vscode/
 # TODO
 # */users/views.py
-# */users/migrations/
-# */artists/migrations/
-# */artworks/migrations/
-# */market/migrations/
-# */media-back/
+ */users/migrations/
+ */artists/migrations/
+ */artworks/migrations/
+ */market/migrations/
+ */media-back/
+ */news/migrations/
 # *Dockerfile
 # C extensions
 *.so
@@ -171,5 +172,7 @@ cython_debug/
 #.idea/
 
 # алгоритм оценки произведений
-*catboost_v1.json
-*Paintings_v2.py
+# *catboost_v1.json
+# *Paintings_v2.py
+
+# *frontend/

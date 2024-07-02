@@ -1,18 +1,10 @@
 from django.test import TestCase
-from rest_framework.serializers import ValidationError
-from rest_framework.test import APIRequestFactory, APITestCase
-from rest_framework import status
-from users.models import User
-from django.utils import timezone
-from unittest.mock import patch
 
 from api.market_serializers import (ArtworkToShoppingCartAuthorSerializer,
-                                    ArtworkToShoppingCartSerializer,
-                                    OrderCreateSerializer)
+                                    ArtworkToShoppingCartSerializer)
 from artists.models import ArtistModel
-from artworks.models import ArtworkPriceModel, ArtworkModel, StyleModel
-from market.models import (OrderModel, ShoppingCartModel,
-                           PurchaseModel)
+from artworks.models import ArtworkModel, StyleModel
+from users.models import User
 
 
 class TestArtworkToShoppingCartAuthorSerializer(TestCase):

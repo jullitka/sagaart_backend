@@ -1,12 +1,11 @@
-import django.db
-from django.contrib.auth import get_user_model
+import base64
 import django.contrib.auth.password_validation as validators
+from django.contrib.auth import get_user_model
 from django.core import exceptions
 from django.core.files.base import ContentFile
 
 from requests import Response
 from rest_framework import serializers, status
-import base64
 import numpy as np
 from catboost import CatBoostRegressor
 from market.models import NewsModel
@@ -35,7 +34,7 @@ class Base64ImageField(serializers.ImageField):
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
-    '''Сериализатор создание пользователя'''
+    """Сериализатор создание пользователя"""
     password = serializers.CharField(write_only=True)
     phone_number = serializers.RegexField(
         regex=r'^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$',
@@ -74,7 +73,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
 
 class UserRetriveSerializer(serializers.ModelSerializer):
-    '''Сериализатор карточки юзера'''
+    """Сериализатор карточки юзера"""
     class Meta:
         model = User
         fields = [
@@ -89,12 +88,14 @@ class UserRetriveSerializer(serializers.ModelSerializer):
 
 
 class SubscribeSerializer(serializers.ModelSerializer):
+    """Сериализатор подписки"""
     class Meta:
         model = Subscribe
         fields = '__all__'
 
 
 class SubscribeUserSerializer(serializers.ModelSerializer):
+    """Сериализатор подписок пользователей"""
     email = serializers.CharField(source='user_id.email')
     price = serializers.IntegerField(source='subscribe.price')
     sub_time = serializers.CharField(source='subscribe.sub_time')
@@ -109,16 +110,8 @@ class SubscribeUserSerializer(serializers.ModelSerializer):
         ]
 
 
-FIELDS_FOR_ART_OBJECTS = (
-    'title', 'artist', 'description', 'imageUrl',
-    'size', 'orientation', 'brushstrokes_material',
-    'style', 'decoration', 'year',
-    'series', 'author_signature', 'email', 'id'
-)
-
-
 class ArtListSerializer(serializers.ModelSerializer):
-    '''Сериализатор для каталога арт-объектов'''
+    """Сериализатор для каталога арт-объектов"""
     title = serializers.CharField(source='name')
     artist = serializers.CharField(source='author')
     year = serializers.CharField()
@@ -141,21 +134,21 @@ class ArtListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ArtworkModel
-        fields = FIELDS_FOR_ART_OBJECTS+('original_price','poster_price')
+        fields = FIELDS_FOR_ART_OBJECTS + ('original_price', 'poster_price')
         extra_kwargs = {
             'price': {'read_only': True},
         }
 
 
 class AuthorSerializer(serializers.ModelSerializer):
-    '''Сериализатор автора произведения'''
+    """Сериализатор автора произведения"""
     class Meta:
         model = ArtistModel
         fields = ('id', 'name',)
 
 
 class ArtObjectSerializer(ArtListSerializer):
-    '''Сериализатор для карточки товара'''
+    """Сериализатор для карточки товара"""
     about_author = serializers.CharField(
         source='author.about_artist', read_only=True
     )
@@ -191,12 +184,13 @@ class ArtObjectSerializer(ArtListSerializer):
         read_only_fields = (
             FIELDS_FOR_ART_OBJECTS
             + ('about_author', 'author_name', 'author_photo', 'author_user_id')+('original_price','poster_price')
+
         )
         
 
 
 class ArtPriceSerializer(serializers.ModelSerializer):
-    '''Сериализатор отображения цен для произведения'''
+    """Сериализатор отображения цен для произведения"""
     original_price = serializers.IntegerField()
     copy_price = serializers.IntegerField()
 
@@ -232,7 +226,7 @@ class FavoriteArtworkSerializer(serializers.ModelSerializer):
 
 
 class NewsSerializer(serializers.ModelSerializer):
-    '''Сериализатор новостей'''
+    """Сериализатор новостей"""
     date_pub = serializers.DateTimeField('%d.%m.%Y')
 
     class Meta:
@@ -248,7 +242,7 @@ class StyleSerializer(serializers.ModelSerializer):
 
 
 class FavoriteSerializer(serializers.ModelSerializer):
-    '''Сериализатор для избранных авторов'''
+    """Сериализатор для избранных авторов"""
     name = serializers.CharField(source='artist.name')
     about_artist = serializers.CharField(source='artist.about_artist')
     imageUrl = Base64ImageField(source='artist.photo')
@@ -262,9 +256,9 @@ class FavoriteSerializer(serializers.ModelSerializer):
         )
 
 
-"""
-Группа сериализаторов для эндпоинтов v2
-"""
+"""Группа сериализаторов для эндпоинтов v2"""
+
+
 class TestArtistModelSerializer(serializers.ModelSerializer):
     artist_id = serializers.IntegerField(source='id', read_only=True)
 
@@ -283,10 +277,12 @@ class CategorySerializer(serializers.ModelSerializer):
         model = CategoryModel
         fields = ('name', )
 
+
 class SeriesSerializer(serializers.ModelSerializer):
     class Meta:
         model = SeriesModel
         fields = ('name', )
+
 
 class TestArtWrokSerializer(serializers.ModelSerializer):
     author = TestArtistModelSerializer()
@@ -321,11 +317,9 @@ class TestArtWrokSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
-        '''
-            При создании вытаскивает стиль и серию если поля незаполнены
-            выставляет null, в ином случае либо достает данные(стиля, серии)из бд
-            либо создает новые
-        '''
+        """ При создании вытаскивает стиль и серию если поля незаполнены
+        выставляет null, в ином случае либо достает данные
+        (стиля, серии) из бд либо создает новые."""
 
         style = validated_data.pop('style')
         series = validated_data.pop('series')
@@ -344,6 +338,11 @@ class TestArtWrokSerializer(serializers.ModelSerializer):
                 **style
             )
             artwork.style = current_style
+        #    ArtworkPriceModel.objects.create(
+        #        artwork=artwork,
+        #        original_price=self.data['original_price'],
+        #        copy_price=None
+        #    )
         return artwork
 
     def validate_category(self, category):
@@ -376,3 +375,8 @@ class TestArtWrokSerializer(serializers.ModelSerializer):
             if len(res) == 2:
                 return size
         return None
+
+      #  price = estimation(data=data)
+      #  self.initial_data['original_price'] = price
+      #  return price
+

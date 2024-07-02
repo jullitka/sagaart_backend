@@ -1,8 +1,8 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 
-from .constants import DELIVERY_TYPE_CHOICES, PAYMENT_METHOD_CHOICES
 from artworks.models import ArtworkModel
+from market.constants import DELIVERY_TYPE_CHOICES, PAYMENT_METHOD_CHOICES
 from users.models import User
 
 
@@ -137,18 +137,3 @@ class PurchaseModel(models.Model):
 
     def __str__(self):
         return f'{self.artwork} из заказа {self.order}'
-
-
-class NewsModel(models.Model):
-    name = models.CharField(
-        max_length=100, 
-        null=False, 
-        blank=False, 
-        unique=True
-    )
-    text = models.TextField()
-    is_active = models.BooleanField()
-    date_pub = models.DateTimeField(auto_now_add=True,)
-
-    def __str__(self) -> str:
-        return f'Новость с название {self.name}. {"Активно" if self.is_active else "Неактивно"}'

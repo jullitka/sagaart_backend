@@ -1,9 +1,8 @@
 from django.db import transaction
 from django.utils import timezone
-
 from rest_framework import serializers
 
-from .serializers import StyleSerializer
+from api.serializers import StyleSerializer
 from artworks.models import ArtistModel, ArtworkModel, ArtworkPriceModel
 from market.constants import DELIVERY_TYPE_CHOICES, PAYMENT_METHOD_CHOICES
 from market.models import OrderModel, PurchaseModel, ShoppingCartModel
@@ -146,7 +145,7 @@ class DeliverySerializer(serializers.ModelSerializer):
 
     def get_artwork_author(self, obj):
         return obj.artwork.author.name
-    
+
     def get_delivery_type(self, obj):
         return obj.order.delivery_type
 
@@ -154,11 +153,10 @@ class DeliverySerializer(serializers.ModelSerializer):
         current_time = timezone.now()
         if not obj.in_delivery:
             return "Ожидает передачи в доставку"
-        elif not obj.delivery_date:
+        if not obj.delivery_date:
             return "Нет информации о"
-        elif obj.is_delivered:
+        if obj.is_delivered:
             return "Доставлено"
-        elif obj.delivery_date and obj.delivery_date < current_time:
+        if obj.delivery_date and obj.delivery_date < current_time:
             return "Задерживается"
-        else:
-            return "В пути"
+        return "В пути"

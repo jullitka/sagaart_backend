@@ -1,6 +1,3 @@
-from datetime import datetime, timedelta
-
-import jwt
 from django.contrib.auth.models import AbstractBaseUser
 from django.db import models
 
@@ -18,7 +15,7 @@ class PermUser:
 
 class Subscribe(models.Model):
     price = models.IntegerField('Cтоимость подписки')
-    sub_time = models.IntegerField('Срок подписки')  # | models.DurationField()
+    sub_time = models.IntegerField('Срок подписки')
 
     def __str__(self):
         return (f'Длительность {self.sub_time} Стоимость {self.price}')
@@ -111,7 +108,7 @@ class User(AbstractBaseUser, PermUser):
     REQUIRED_FIELDS = ['name', 'surname', 'phone_number']
 
     def __str__(self):
-        return f'mail={self.email}, name={self.name}, status={self.status}'
+        return f'{self.email}, {self.name} {self.surname}'
 
     class Meta:
         verbose_name = 'Пользователь'

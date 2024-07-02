@@ -1,5 +1,5 @@
 from django.contrib.auth import get_user_model
-from rest_framework.permissions import SAFE_METHODS, BasePermission
+from rest_framework.permissions import BasePermission, SAFE_METHODS
 
 User = get_user_model()
 
@@ -17,7 +17,7 @@ class IsOwnerProfile(BasePermission):
 
 
 class IsAdminOrRead(BasePermission):
-    ''' Проверка является лиюзер админом'''
+    """Проверка является ли юзер админом"""
     def has_permission(self, request, view):
         return (
             request.method in SAFE_METHODS
@@ -29,9 +29,10 @@ class IsAdminOrRead(BasePermission):
             request.method in SAFE_METHODS
             or request.user == User.is_staff
         )
-    
+
 
 class IsAuthenticatedOrAuthorOrReadOnly(BasePermission):
+    """Доступ авторизованному пользователю или только чтение"""
     def has_permission(self, request, view):
         return (
             request.method in SAFE_METHODS
