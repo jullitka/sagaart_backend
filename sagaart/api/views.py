@@ -32,8 +32,13 @@ from api.utils import get_object_by_filter
 from artists.models import SeriesModel, FavoriteArtistModel
 from artworks.models import (ArtistModel, ArtworkModel, ArtworkPriceModel,
                              FavoriteArtworkModel, StyleModel)
-from news.models import NewsModel
+from algorithm.estimation import estimation, get_data
 from users.models import Subscribe, UserSubscribe
+from market.models import NewsModel
+from api.serializers import NewsSerializer
+from django.core.mail import send_mail
+
+from news.models import NewsModel
 
 
 User = get_user_model()
@@ -163,25 +168,27 @@ class PaintingsAPIView(generics.ListCreateAPIView):
                 author_signature=data['author_signature'],
                 series=series
             )
-            try:
-                # получение цены с помощью алгоритма оценки
-                data_for_estimate = get_data(
-                    category=None, year=data['year'],
-                    dimensions=data['size'],
-                    materials=data['brushstrokes_material'],
-                    author_name=data['artist']
-                )
-                price = estimation(data_for_estimate)
-                ArtworkPriceModel.objects.create(
-                    artwork=art, original_price=price
-                )
-                art.is_estimate = True
-                art.save()
-            except Exception:
-                return Response(
-                    {"Алгоритм оценки временно не работает,работа сохранена в базе без оценки"},
-                    status=status.HTTP_201_CREATED
-                )
+
+    #        try:
+    #            # получение цены с помощью алгоритма оценки
+    #            data_for_estimate = get_data(
+    #                category=None, year=data['year'],
+    #                dimensions=data['size'],
+    #                materials=data['brushstrokes_material'],
+    #                author_name=data['artist']
+    #            )
+    #            price = estimation(data_for_estimate)
+    #            ArtworkPriceModel.objects.create(
+    #                artwork=art, original_price=price
+    #            )
+    #            art.is_estimate = True
+    #            art.save()
+    #        except Exception:
+    #            return Response(
+    #                {"Алгоритм оценки временно не работает,работа сохранена в базе без оценки"},
+    #                status=status.HTTP_201_CREATED
+    #            )
+
 
             # price = ArtworkPriceModel.objects.filter(artwork=art)
             # art.price = price
@@ -190,19 +197,54 @@ class PaintingsAPIView(generics.ListCreateAPIView):
                 {'Ошибка': f' Нет поля {er}'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        #send_mail(subject='вы создали', message='aaaa', from_email=None, recipient_list=('@gmail.com',))
         return Response(
             data=(request.data,),
             status=status.HTTP_201_CREATED
         )
 
-
 @extend_schema_view(**ARTVORK_API_SCHEMA_EXTENSIONS)
-class RetrieveArtObject(generics.RetrieveDestroyAPIView):
-    """Представление для карточки арт-объекта"""
+class RetrieveArtObject(generics.RetrieveUpdateDestroyAPIView):
+    '''Представление для карточки арт-объекта'''
+
     queryset = ArtworkModel.objects.all().select_related('author')
     serializer_class = ArtObjectSerializer
     pagination_class = LimitOffsetPagination
     permission_classes = (IsAuthenticatedOrReadOnly,)
+    http_method_names = ['get', 'delete', 'patch']
+
+    def patch(self, request, *args, **kwargs):
+        user = User.objects.get(email=request.user)
+        if user.subscription is None and user.status not in User.UserStatus.SALER_ARTIST:
+            return Response(
+                {'Ошибка': 'Отправить на оценку можно только с подпиской или художнику'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if request.data['to_review']:
+            artwork = ArtworkModel.objects.get(id=kwargs['pk'])
+            author = artwork.author
+            data = get_data(
+                category=artwork.category.name,
+                year=artwork.year,
+                dimensions=artwork.size,
+                materials=artwork.brushstrokes_material,
+                author_name=author.name
+            )
+
+            price = estimation(data=data)
+            price = ArtworkPriceModel.objects.create(
+                artwork=artwork,
+                original_price=price,
+                copy_price=None
+            )
+            return Response(
+                {'Оценочная стоимость вашей картины': price.original_price},
+                status=status.HTTP_200_OK
+            )
+        return Response(
+            {'Ошибка': 'изменение полей запрещено'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     def delete(self, request, *args, **kwargs):
         artwork = ArtworkModel.objects.get(
@@ -220,26 +262,29 @@ class RetrieveArtObject(generics.RetrieveDestroyAPIView):
 class TestArtworkViewSet(viewsets.ModelViewSet):
     queryset = ArtworkModel.objects.filter(is_on_sold='on sale')
     serializer_class = TestArtWrokSerializer
-    pagination_class = LimitOffsetPagination
     permission_classes = (IsAuthenticatedOrReadOnly,)
-    filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
-    filterset_fields = (
-        'brushstrokes_material', 'size', 'decoration',
-        'orientation', 'style', 'author')
-    search_fields = ('name',)
     http_method_names = ['post']
 
-    def list(self, request):
-        result = self.queryset
-        serializer = ArtListSerializer(result, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(['get'], True)
-    def get(self, request):
-        print(request.data)
-        result = self.queryset.first()
-        serializer = ArtObjectSerializer(result, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+  #  filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
+  #  filterset_fields = (
+  #      'brushstrokes_material', 'size', 'decoration',
+  #      'orientation', 'style', 'author')
+  #  search_fields = ('name',)
+  #  http_method_names = ['post']
+
+  #  def list(self, request):
+  #      result = self.queryset
+  #      serializer = ArtListSerializer(result, many=True)
+  #      return Response(serializer.data, status=status.HTTP_200_OK)
+
+  #  @action(['get'], True)
+  #  def get(self, request):
+  #      print(request.data)
+  #      result = self.queryset.first()
+  #      serializer = ArtObjectSerializer(result, many=True)
+  #      return Response(serializer.data, status=status.HTTP_200_OK)
+
 
     def perform_create(self, serializer):
         return serializer.save(
@@ -262,7 +307,7 @@ class FavoriteArt(viewsets.ModelViewSet):
         if destroy:
             destroy.delete()
             return Response(
-                {'Ошибка': 'В избранном нет такого произведения'},
+                {'status': 'Успешно удалено'},
                 status=status.HTTP_204_NO_CONTENT
             )
         return Response(
@@ -287,7 +332,8 @@ class FavoriteArt(viewsets.ModelViewSet):
             return Response({'Ошибка': f' Нет поля {er}'})
         if create:
             request.data['user'] = request.user.id
-            return Response(request.data, status=status.HTTP_201_CREATED)
+            serializer = self.get_serializer(result)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response({'Ошибка': 'вы уже добавили в избранное'})
 
 
@@ -295,6 +341,7 @@ class FavoriteArt(viewsets.ModelViewSet):
 class NewsViewSet(generics.ListAPIView):
     """Представление для отображение активных новостей"""
     queryset = NewsModel.objects.filter(is_active=True).order_by('-date_pub')
+    permission_classes = (AllowAny,)
     serializer_class = NewsSerializer
 
 

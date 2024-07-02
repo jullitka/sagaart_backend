@@ -3,17 +3,21 @@ import django.contrib.auth.password_validation as validators
 from django.contrib.auth import get_user_model
 from django.core import exceptions
 from django.core.files.base import ContentFile
-from rest_framework import serializers
 
-from api.constants import FIELDS_FOR_ART_OBJECTS
-from artists.models import FavoriteArtistModel
-from artworks.models import (ArtistModel, ArtworkModel, ArtworkPriceModel,
-                             CategoryModel, FavoriteArtworkModel,
-                             SeriesModel, StyleModel)
-from algorithm.estimation import estimation, get_data
-from news.models import NewsModel
+from requests import Response
+from rest_framework import serializers, status
+import numpy as np
+from catboost import CatBoostRegressor
+from market.models import NewsModel
+from artworks.models import (ArtistModel, ArtworkModel, FavoriteArtworkModel,
+                             StyleModel, ArtworkPriceModel, SeriesModel,
+                             CategoryModel)
+from algorithm.estimation import estimation, get_author_data, get_data
+from sagaart.settings import BASE_DIR
 from users.models import Subscribe, UserSubscribe
-
+from artists.models import FavoriteArtistModel
+from algorithm.Paintings_v2 import preprocess
+import re
 
 User = get_user_model()
 
@@ -159,6 +163,7 @@ class ArtObjectSerializer(ArtListSerializer):
     )
     original_price = serializers.SerializerMethodField()
     poster_price = serializers.SerializerMethodField()
+    to_review = serializers.BooleanField(write_only=True, default=False)
 
     def get_original_price(self, obj):
         result = ArtworkPriceModel.objects.filter(artwork=obj.id).first()
@@ -174,10 +179,14 @@ class ArtObjectSerializer(ArtListSerializer):
         model = ArtworkModel
         fields = (
             FIELDS_FOR_ART_OBJECTS
-            + (
-                'about_author', 'author_name', 'author_photo', 'author_user_id'
-            ) + ('original_price', 'poster_price')
+            + ('about_author', 'author_name', 'author_photo', 'author_user_id')+('original_price','poster_price')
+        )+('to_review',)
+        read_only_fields = (
+            FIELDS_FOR_ART_OBJECTS
+            + ('about_author', 'author_name', 'author_photo', 'author_user_id')+('original_price','poster_price')
+
         )
+        
 
 
 class ArtPriceSerializer(serializers.ModelSerializer):
@@ -191,10 +200,10 @@ class ArtPriceSerializer(serializers.ModelSerializer):
 
 
 class FavoriteArtworkSerializer(serializers.ModelSerializer):
-    """Сериализатор избранных произведений"""
-    art_photo = serializers.ImageField(source='artwork.image')
-    artist_name = serializers.CharField(source='artwork.author.name')
-    art_name = serializers.CharField(source='artwork.name')
+    '''Сериализатор избранных произведений'''
+    art_photo = serializers.ImageField(source='artwork.image', read_only=True)
+    artist_name = serializers.CharField(source='artwork.author.name', read_only=True)
+    art_name = serializers.CharField(source='artwork.name', read_only=True)
     original_price = serializers.SerializerMethodField()
     poster_price = serializers.SerializerMethodField()
 
@@ -281,7 +290,7 @@ class TestArtWrokSerializer(serializers.ModelSerializer):
     series = SeriesSerializer(allow_null=True)
     category = CategorySerializer(allow_null=True)
     image = Base64ImageField()
-    original_price = serializers.SerializerMethodField()
+    original_price = serializers.CharField(read_only=True)
     poster_price = serializers.CharField(default=None, read_only=True)
 
     class Meta:
@@ -314,6 +323,10 @@ class TestArtWrokSerializer(serializers.ModelSerializer):
 
         style = validated_data.pop('style')
         series = validated_data.pop('series')
+        if validated_data['size'] is None:
+            raise serializers.ValidationError('Неверный формат size')
+        if validated_data['brushstrokes_material'] is None:
+            raise serializers.ValidationError('Неверный формат brushstrokes_material')
         artwork = ArtworkModel.objects.create(**validated_data)
         if series:
             current_series, _ = SeriesModel.objects.get_or_create(
@@ -325,11 +338,11 @@ class TestArtWrokSerializer(serializers.ModelSerializer):
                 **style
             )
             artwork.style = current_style
-            ArtworkPriceModel.objects.create(
-                artwork=artwork,
-                original_price=self.data['original_price'],
-                copy_price=None
-            )
+        #    ArtworkPriceModel.objects.create(
+        #        artwork=artwork,
+        #        original_price=self.data['original_price'],
+        #        copy_price=None
+        #    )
         return artwork
 
     def validate_category(self, category):
@@ -348,18 +361,22 @@ class TestArtWrokSerializer(serializers.ModelSerializer):
         artist, _ = ArtistModel.objects.get_or_create(**author)
         return artist
 
-    def get_original_price(self, original_price):
-        author = self.validated_data['author']
-        if author.is_valid():
-            category = self.validated_data['category']
-        data = get_data(
-            category=category.name,
-            year=self.validated_data['year'],
-            dimensions=self.validated_data['size'],
-            materials=self.validated_data['brushstrokes_material'],
-            author_name=author.name
-        )
+    def validate_brushstrokes_material(self, brushstrokes_material):
+        result = brushstrokes_material.split(',')
+        if result:
+            if len(result) == 2:
+                return brushstrokes_material
+        return None
 
-        price = estimation(data=data)
-        self.initial_data['original_price'] = price
-        return price
+    def validate_size(self, size):
+        result = re.match(r'\d*[x]\d*', size)
+        if result:
+            res = result.group().split('x')
+            if len(res) == 2:
+                return size
+        return None
+
+      #  price = estimation(data=data)
+      #  self.initial_data['original_price'] = price
+      #  return price
+
