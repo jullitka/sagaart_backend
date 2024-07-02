@@ -146,7 +146,7 @@ class DeliverySerializer(serializers.ModelSerializer):
 
     def get_artwork_author(self, obj):
         return obj.artwork.author.name
-    
+
     def get_delivery_type(self, obj):
         return obj.order.delivery_type
 

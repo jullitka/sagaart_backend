@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'api',
     'users',
+    'news',
     'django_filters',
     'rest_framework',
     'drf_spectacular',

@@ -8,6 +8,8 @@ from django.core import exceptions
 from django.core.files.base import ContentFile
 from rest_framework import serializers
 
+
+from news.models import NewsModel
 from artists.models import FavoriteArtistModel
 from artworks.models import (ArtistModel, ArtworkModel, ArtworkPriceModel, 
                              CategoryModel, FavoriteArtworkModel,

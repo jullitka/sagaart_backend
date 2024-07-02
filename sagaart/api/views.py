@@ -34,7 +34,7 @@ from artworks.models import (ArtistModel, ArtworkModel, ArtworkPriceModel,
                              FavoriteArtworkModel, StyleModel)
 from algorithm.estimation import estimation, get_data
 from users.models import Subscribe, UserSubscribe
-from market.models import NewsModel
+from news.models import NewsModel
 from api.serializers import NewsSerializer
 
 SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
