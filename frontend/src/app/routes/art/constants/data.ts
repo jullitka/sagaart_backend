@@ -36,9 +36,6 @@ const printButton = {
 
 const artMockData = {
   artist: {
-    name: 'Анастасия Рыкунова',
-    description:
-      'Основные темы рассуждений в моем творчестве - это повествование об окружающем меня социуме, человеческих переживаниях.',
     mentors:
       'На моё творчество повлияли такие художники, как: Lucian Freud, Phil Hale, Francois Bard, Käthe Kollwitz.',
     study: [
@@ -70,15 +67,6 @@ const artMockData = {
       { year: '2017', info: 'Дым перемен, Москва, Россия' },
     ],
   },
-  artName: 'Цветы войны',
-  year: '2024',
-  size: '58х70 см',
-  material: 'масло, холст',
-  style: 'реализм',
-  signature: 'авторская',
-  exhibitions: '5 групповых',
-  design: 'подрамник',
-  series: 'Flowers of war',
   price: {
     original: '40 000 ₽',
     print: '6 000 ₽',

@@ -38,6 +38,94 @@ const styles = {
   buttonBuy: {
         margin: '0px 0px 0px 78%;',
   },
+  PurchaseInfoTitle: {fontWeight: '400',
+  fontSize: '36px',
+  lineHeight: '50.4px',
+  margin: '0px 0px 0px 32px',
+  width: 597,
+  height: 150,
+},
+closeButton: {
+    padding: '0',
+    position: 'absolute',
+    top: '35px',
+    right: '32px',
+},
+  PurchaseInfoModal: {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '40px',
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 890,
+  height: 1029,
+  bgcolor: 'background.paper',
+  p: 7.50,
+},
+PurchaseInfoModalHeader: {
+  display: 'flex',
+},
+PurchaseInfoContact: {
+  fontWeight: '400', fontSize: '20px', lineHeight: '28px', margin: '0px 0px 16px 0px',
+},
+PurchaseInfoAdress: {
+  fontWeight: '500', fontSize: '20px', lineHeight: '24.2px', margin: '20px 0px 16px 0px', color: 'text.secondary',
+},
+PurchaseInfoCard: {
+  width: 507,
+  height: 58,
+},
+PurchaseInfoAdressInput: {
+  width: 768,
+  height: 60,
+},
+PurchaseInfoComment: {
+  width: 768,
+  height: 110,
+},
+PurchaseInfoPenIcon: {
+  margin: '-42px 0px 0px 60%',
+},
+PurchaseInfoPenIcon2: {
+  margin: '-45px 0px 0px 90%',
+},
+PurchaseInfoRadioArea: {
+display: 'flex',
+margin: '45px 0px 0px 0px',
+  width: 663,
+  height: 143,
+},
+PurchaseInfoRadioTitle: {
+  fontWeight: '500', fontSize: '28px', lineHeight: '33.89px', margin: '0px 0px 25px 0px',
+},
+PurchaseInfoRadioSubTitle:{
+  fontWeight: '400', fontSize: '24px', lineHeight: '33.6px', margin: '0px 0px 0px 0px',
+},
+PurchaseInfoPrice: {
+margin: '80px -80px 26px 0px'
+},
+ButtonWidth: '768px',
+ButtonfontSize: '24px',
+PurchaseInfoBank: {
+position: 'absolute',
+margin: '15px 0px 0px 20px'
+},
+PurchaseInfoCardNumber:{
+margin: '0px 0px 0px 90px',
+fontWeight: '700',
+fontSize: '20px',
+lineHeight: '24.2px',
+},
+PurchaseInfoRadioPayment: {
+margin: '0px 0px 0px 0px',
+},
+PurchaseInfoLine:{
+  borderLeft: 1,
+  borderColor: "secondary",
+  margin: '0px 45px 10px 30px',
+},
   deleteIcon: {
     display: 'flex',
     width: 65,

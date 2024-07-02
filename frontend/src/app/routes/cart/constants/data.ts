@@ -26,8 +26,13 @@ const cart = {
   img1: cartItem1,
   deleteIcon: deleteIcon,
   buttonText: 'оформить',
+  buttonlineHeight: '1.6',
   imagePriceTotal: ' Итого: ',
   imagePriceTotalSum: ' 130 000₽ ',
+  PurchaseInfo: 'Для оформления заказа выберите способ оплаты и доставки ',
+  PurchaseInfoContact: 'Иванов Иван, ivanov@gmail.com, +375 29 258 12 13',
+  PurchaseInfoAdress: 'Адрес',
+  PurchaseInfoComment: 'Комментарий к заказу',
 };
 
 const button = {
@@ -42,4 +47,9 @@ const button = {
   lineHeight: '38.73px',
 };
 
-export { cart, button };
+const logoSize = {
+  width: '111px',
+  height: '132px',
+};
+
+export { cart, button, logoSize };

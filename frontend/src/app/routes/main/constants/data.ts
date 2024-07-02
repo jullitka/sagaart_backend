@@ -53,6 +53,8 @@ const cardsData = [
   { title: 'Художники', rout: '/catalog/artists', img: artistsImg },
 ];
 
+const catalogUrl = '/catalog';
+
 export {
   subscriptionData,
   catalogData,
@@ -60,4 +62,5 @@ export {
   catalogBuyButton,
   catalogSellButton,
   cardsData,
+  catalogUrl,
 };

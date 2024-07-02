@@ -29,6 +29,14 @@ const styles = {
     alignItems: 'flex-start',
     columnGap: '12px',
   },
+  appraisalButton: {
+    padding: '0',
+    fontWeight: '400',
+    fontSize: '24px',
+    lineHeight: '33.6px',
+    textTransform: 'none',
+    color: '#252525',
+  },
 };
 
 export default styles;

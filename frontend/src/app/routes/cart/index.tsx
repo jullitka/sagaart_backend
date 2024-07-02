@@ -1,10 +1,35 @@
-import { Box, Typography } from "@mui/material";
-import { button, cart } from "./constants/data";
+import { useState } from "react";
+import Modal from "@mui/material/Modal";
+import {
+ Box,
+ TextField,
+ Typography,
+ RadioGroup,
+ FormControlLabel,
+ Radio,
+ IconButton,
+} from "@mui/material";
+import { button, cart, logoSize } from "./constants/data";
 import styles from "./constants/styles";
-
 import Button from "../../../shared/ui/Button";
+import Logo from "../../../shared/ui/Logo";
+import PenIcon from "./assets/pen.svg?react";
+import MIR from "./assets/MIR.svg?react";
+import CloseIcon from "./assets/close.svg?react";
+import Line from "./assets/Line 6.svg?react";
+import { Form } from "react-router-dom";
 
 const Cart = () => {
+ const [open, setOpen] = useState(false);
+
+ const handleOpen = () => {
+  setOpen(true);
+ };
+
+ const handleClose = () => {
+  setOpen(false);
+ };
+
  return (
   <Box sx={styles.cart}>
    <Box sx={styles.container}>
@@ -82,6 +107,7 @@ const Cart = () => {
    </Box>
    <Box sx={styles.buttonBuy}>
     <Button
+     onClick={handleOpen}
      text={cart.buttonText}
      bgColor={button.bgColor}
      padding={button.padding}
@@ -91,8 +117,153 @@ const Cart = () => {
      color={button.color}
     />
    </Box>
+   <ModalWindow open={open} handleClose={handleClose} />
   </Box>
  );
 };
+
+function ModalWindow({
+ open,
+ handleClose,
+}: {
+ open: boolean;
+ handleClose: () => void;
+}) {
+ return (
+  <Modal
+   open={open}
+   onClose={handleClose}
+   aria-labelledby="PurchaseInfomodal-title"
+   aria-describedby="PurchaseInfomodal-description"
+  >
+   <Box sx={styles.PurchaseInfoModal}>
+    <Box sx={styles.PurchaseInfoModalHeader}>
+     <Logo width={logoSize.width} height={logoSize.height} />
+     <Typography sx={styles.PurchaseInfoTitle}>{cart.PurchaseInfo}</Typography>
+     <IconButton onMouseDown={handleClose} sx={styles.closeButton}>
+      <CloseIcon />
+     </IconButton>
+    </Box>
+    <Form color="primary">
+     <Typography sx={styles.PurchaseInfoContact}>
+      {cart.PurchaseInfoContact}
+     </Typography>
+     <Box sx={styles.PurchaseInfoBank}>
+      <MIR />
+     </Box>
+     <TextField
+      sx={styles.PurchaseInfoCard}
+      label={
+       <Typography style={styles.PurchaseInfoCardNumber}>MIR **1111</Typography>
+      }
+      required
+     ></TextField>
+     <Box sx={styles.PurchaseInfoPenIcon}>
+      <PenIcon />
+     </Box>
+     <Typography sx={styles.PurchaseInfoAdress}>
+      {cart.PurchaseInfoAdress}
+     </Typography>
+     <TextField
+      sx={styles.PurchaseInfoAdressInput}
+      placeholder="Введите адрес"
+      required
+     ></TextField>
+     <Box sx={styles.PurchaseInfoPenIcon2}>
+      <PenIcon />
+     </Box>
+     <Box sx={styles.PurchaseInfoRadioArea}>
+      <Box>
+       <Typography sx={styles.PurchaseInfoRadioTitle}>
+        Способ доставки
+       </Typography>
+       <RadioGroup>
+        <FormControlLabel
+         value="Доставить с курьером"
+         control={<Radio sx={{ color: "black" }} />}
+         label={
+          <Typography style={styles.PurchaseInfoRadioSubTitle}>
+           Доставить с курьером
+          </Typography>
+         }
+        />
+        <FormControlLabel
+         value="Самовывоз"
+         control={<Radio sx={{ color: "black" }} />}
+         label={
+          <Typography style={styles.PurchaseInfoRadioSubTitle}>
+           Самовывоз
+          </Typography>
+         }
+        />
+       </RadioGroup>
+      </Box>
+      <Box sx={styles.PurchaseInfoLine}>
+       <Line />
+      </Box>
+      <Box>
+       <Box sx={styles.PurchaseInfoRadioPayment}>
+        <Typography sx={styles.PurchaseInfoRadioTitle}>
+         Способ оплаты
+        </Typography>
+        <RadioGroup>
+         <FormControlLabel
+          value="При получении"
+          control={<Radio sx={{ color: "black" }} />}
+          label={
+           <Typography style={styles.PurchaseInfoRadioSubTitle}>
+            При получении
+           </Typography>
+          }
+         />
+         <FormControlLabel
+          value="Оплатить онлайн"
+          control={<Radio sx={{ color: "black" }} />}
+          label={
+           <Typography style={styles.PurchaseInfoRadioSubTitle}>
+            Оплатить онлайн
+           </Typography>
+          }
+         />
+        </RadioGroup>
+       </Box>
+      </Box>
+     </Box>
+     <Typography sx={styles.PurchaseInfoAdress}>
+      {cart.PurchaseInfoComment}
+     </Typography>
+     <Box sx={styles.PurchaseInfoComment}>
+      <TextField
+       sx={styles.PurchaseInfoComment}
+       // label="Введите сообщение..."
+       multiline
+       rows={4}
+       defaultValue="Введите сообщение..."
+      />
+     </Box>
+     <Box sx={styles.PurchaseInfoPrice}>
+      <Box sx={styles.imagePriceTotalPrice}>
+       <Typography sx={styles.imagePriceTotalSum}>
+        {cart.imagePriceTotalSum}
+       </Typography>
+       <Typography sx={styles.imagePriceTotal}>
+        {cart.imagePriceTotal}
+       </Typography>
+      </Box>
+     </Box>
+     <Button
+      text={cart.buttonText}
+      bgColor={button.bgColor}
+      padding={button.padding}
+      fontSize={styles.ButtonfontSize}
+      lineHeight={cart.buttonlineHeight}
+      color={button.color}
+      width={styles.ButtonWidth}
+     />
+    </Form>
+   </Box>
+  </Modal>
+ );
+}
 
 export default Cart;

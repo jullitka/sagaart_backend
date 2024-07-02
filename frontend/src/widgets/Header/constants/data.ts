@@ -3,14 +3,28 @@ const logoSize = {
   height: '134px',
 };
 
-const navLinksData = [
-  { rout: '/', text: 'Главная' },
-  { rout: '/catalog', text: 'Каталог' },
-  { rout: '/appraisal', text: 'Честная оценка' },
-  { rout: '/pricing', text: 'Ценообразование' },
-  { rout: '/consultation', text: 'Арт-консультация' },
-  { rout: '/news', text: 'Новости' },
-];
+const navLinksData = {
+  main: {
+    rout: '/',
+    text: 'Главная',
+  },
+  catalog: {
+    rout: '/catalog',
+    text: 'Каталог',
+  },
+  pricing: {
+    rout: '/pricing',
+    text: 'Ценообразование',
+  },
+  consultation: {
+    rout: '/consultation',
+    text: 'Арт-консультация',
+  },
+  news: {
+    rout: '/news',
+    text: 'Новости',
+  },
+};
 
 const navButtonsRoutes = {
   cart: '/cart',
@@ -39,6 +53,16 @@ const signUpButton = {
   color: 'white',
 };
 
-const mainRoute = '/'
+const mainRoute = '/';
 
-export { logoSize, navLinksData, navButtonsRoutes, signInButton, signUpButton, mainRoute };
+const appraisalText = 'Честная оценка ';
+
+export {
+  logoSize,
+  navLinksData,
+  navButtonsRoutes,
+  signInButton,
+  signUpButton,
+  mainRoute,
+  appraisalText,
+};

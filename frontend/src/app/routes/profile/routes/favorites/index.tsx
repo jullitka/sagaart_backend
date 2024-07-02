@@ -1,21 +1,37 @@
-import { SetStateAction, useState } from 'react';
+import { SetStateAction, useEffect, useState } from 'react';
+import { getFavoriteArts } from './lib/api';
 import { Masonry } from '@mui/lab';
 
-import { Box, IconButton, MenuItem, Select, Typography } from '@mui/material';
-import {
-  arts,
-  originalText,
-  printText,
-  title,
-  selectData,
-} from './constants/data';
+import { Box, MenuItem, Select, Typography } from '@mui/material';
+import { title, selectData } from './constants/data';
+import { ArtInFavorites } from './constants/types';
 import styles from './constants/styles';
 
-import LikeIcon from './assets/heart.svg?react';
 import ChevronIcon from './assets/chevronDown.svg?react';
+import ArtCard from '../../../../../features/ArtCard';
 
 const Favorites = () => {
+  const [arts, setArts] = useState<ArtInFavorites[]>([]);
   const [selectValue, setSelectValue] = useState(selectData.defaultValue);
+
+  useEffect(() => {
+    getFavoriteArts().then((res) => {
+      console.log(res);
+      setArts(res);
+    });
+  }, []);
+
+  const handleRemoveFromArray = ({
+    removedArtId,
+  }: {
+    removedArtId: number;
+  }) => {
+    const newArts = arts.filter((art) => {
+      art.artwork !== removedArtId;
+    });
+
+    setArts(newArts);
+  };
 
   const handleSelectChange = (e: {
     target: { value: SetStateAction<string> };
@@ -44,32 +60,17 @@ const Favorites = () => {
         <Masonry columns={3} spacing={5} sx={{ maxWidth: '1310px' }}>
           {arts.map((art) => {
             return (
-              <Box key={art.name} sx={styles.art}>
-                <Box component={'img'} src={art.img} sx={styles.artImg} />
-                <Box sx={styles.artInfo}>
-                  <Typography sx={styles.artAuthor}>
-                    {art.author}
-                    <IconButton sx={{ padding: '0' }}>
-                      <LikeIcon />
-                    </IconButton>
-                  </Typography>
-                  <Typography sx={styles.artName}>{art.name}</Typography>
-                </Box>
-                <Box sx={styles.artPricing}>
-                  <Typography sx={styles.artOriginalText}>
-                    {originalText}
-                    <Typography sx={styles.artOriginalPrice} component={'span'}>
-                      {art.original}
-                    </Typography>
-                  </Typography>
-                  <Typography sx={styles.artPrintText}>
-                    {printText}
-                    <Typography sx={styles.artPrintPrice} component={'span'}>
-                      {art.print}
-                    </Typography>
-                  </Typography>
-                </Box>
-              </Box>
+              <ArtCard
+                key={art.artwork}
+                id={art.artwork}
+                title={art.art_name}
+                imageUrl={art.art_photo}
+                artist={art.artist_name}
+                original={art.original_price}
+                print={art.poster_price}
+                isInFavorites={true}
+                handleRemoveFromArray={handleRemoveFromArray}
+              />
             );
           })}
         </Masonry>

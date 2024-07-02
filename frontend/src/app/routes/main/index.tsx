@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 
 import { Box, Typography } from '@mui/material';
 import {
@@ -8,6 +8,7 @@ import {
   catalogBuyButton,
   catalogSellButton,
   cardsData,
+  catalogUrl,
 } from './constants/data';
 import styles from './constants/styles';
 
@@ -17,6 +18,11 @@ import catalogImg from './assets/catalogImg.png';
 import Button from '../../../shared/ui/Button';
 
 const Main = () => {
+  const navigate = useNavigate();
+  const handleClickBuyButton = () => {
+    navigate(catalogUrl);
+  };
+
   return (
     <Box sx={styles.main}>
       <Box sx={styles.container}>
@@ -48,6 +54,7 @@ const Main = () => {
           <Typography sx={styles.subtitle}>{catalogData.subtitle}</Typography>
           <Box sx={styles.buttonsContainer}>
             <Button
+              onClick={handleClickBuyButton}
               text={catalogBuyButton.text}
               bgColor={catalogBuyButton.bgColor}
               padding={catalogBuyButton.padding}
