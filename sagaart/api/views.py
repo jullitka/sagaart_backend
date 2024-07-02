@@ -16,7 +16,7 @@ from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
-from algorithm.estimation import estimation, get_data
+#from algorithm.estimation import estimation, get_data
 from api.messages import SUBSCRIPTIONS, ARTISTS
 from api.constants import (ARTVORK_API_SCHEMA_EXTENSIONS,
                            ARTVORKS_API_SCHEMA_EXTENSIONS,
@@ -28,11 +28,13 @@ from api.constants import (ARTVORK_API_SCHEMA_EXTENSIONS,
 from api.permissions import IsAdminOrRead, IsOwnerProfile
 from api.serializers import (ArtListSerializer, ArtObjectSerializer,
                              SubscribeSerializer, SubscribeUserSerializer,
-                             FavoriteSerializer, FavoriteArtworkSerializer)
+                             FavoriteSerializer, FavoriteArtworkSerializer,
+                             TestArtWrokSerializer)
 from api.utils import get_object_by_filter
 from artists.models import SeriesModel, FavoriteArtistModel
 from artworks.models import (ArtistModel, ArtworkModel, ArtworkPriceModel,
                              FavoriteArtworkModel, StyleModel)
+from algorithm.estimation import estimation
 from users.models import Subscribe, UserSubscribe
 from market.models import NewsModel
 from api.serializers import NewsSerializer
@@ -137,6 +139,7 @@ class PaintingsAPIView(generics.ListCreateAPIView):
         'brushstrokes_material', 'size', 'decoration',
         'orientation', 'style', 'author')  # price
     search_fields = ('name',)
+    http_method_names = ['get', 'delete']
 
     def post(self, request, *args, **kwargs):
         data = request.data
@@ -165,8 +168,25 @@ class PaintingsAPIView(generics.ListCreateAPIView):
                 author_signature=data['author_signature'],
                 series=series
             )
-            price = ArtworkPriceModel.objects.filter(artwork=art)
-            art.price = price
+            try:
+                # получение цены с помощью алгоритма оценки
+                data_for_estimate = get_data(
+                    category=None, year=data['year'],
+                    dimensions=data['size'], materials=data['brushstrokes_material'],
+                    author_name=data['artist']
+                )
+                price = estimation(data_for_estimate)
+                ArtworkPriceModel.objects.create(artwork=art, original_price=price)
+                art.is_estimate = True
+                art.save()
+            except:
+                return Response(
+                    {"Алгоритм оценки временно не работает, работа сохранена в базе без оценки"},
+                    status=status.HTTP_201_CREATED
+                )
+
+            # price = ArtworkPriceModel.objects.filter(artwork=art)
+            # art.price = price
         except Exception as er:
             return Response(
                 {'Ошибка': f' Нет поля {er}'},
@@ -198,8 +218,81 @@ class RetrieveArtObject(generics.RetrieveDestroyAPIView):
                 'Ошибка': 'Невозможно удалить чужой объект'
             }, status=status.HTTP_400_BAD_REQUEST
         )
+    
+
+class TestArtworkViewSet(viewsets.ModelViewSet):
+    queryset = ArtworkModel.objects.filter(is_on_sold='on sale')
+    serializer_class = TestArtWrokSerializer
+    pagination_class = LimitOffsetPagination
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
+    filterset_fields = (
+        'brushstrokes_material', 'size', 'decoration',
+        'orientation', 'style', 'author')  # price
+    search_fields = ('name',)
+
+    def post(self, serializer):
+        data = serializer.data
+        #art = ArtworkModel.objects.create(
+        #        name=data['name'],
+        #        author=data.author,
+                description=data['description'],
+                image=data['imageUrl'],
+                user_id=request.user.id,
+                year=data['year'],
+                size=data['size'],
+                brushstrokes_material=data['brushstrokes_material'],
+              orientation=data['orientation'],
+               style=style,
+                decoration=data['decoration'],
+                author_signature=data['author_signature'],
+                series=series
+            )
+
+    
+
+    def perform_create(self, serializer):
+        print(serializer.data)
+        return serializer.save(
+            user=self.request.user 
+        )
+    
 
 
+
+class TestArtworkViewSet(viewsets.ModelViewSet):
+    queryset = ArtworkModel.objects.filter(is_on_sold='on sale')
+    serializer_class = TestArtWrokSerializer
+    pagination_class = LimitOffsetPagination
+    permission_classes = (IsAuthenticatedOrReadOnly,)
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter,)
+    filterset_fields = (
+        'brushstrokes_material', 'size', 'decoration',
+        'orientation', 'style', 'author')  # price
+    search_fields = ('name',)
+    http_method_names = ['post']
+    
+    def list(self, request):
+        result = self.queryset
+        serializer = ArtListSerializer(result, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @action(['get'],True)
+    def get(self, request):
+        print(request.data)
+        result= self.queryset.first()
+        serializer = ArtObjectSerializer(result, many=True)
+        #result = self.queryset.filter()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+    def perform_create(self, serializer):
+        return serializer.save(
+            user=self.request.user
+        )
+
+
+@extend_schema_view(**FAVORITE_ARTVORK_API_SCHEMA_EXTENSIONS)
 class FavoriteArt(viewsets.ModelViewSet):
     '''Представление избранных работ'''
     queryset = FavoriteArtworkModel.objects.all()
@@ -256,12 +349,12 @@ class FavoriteArtistsViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     permission_classes = [IsAuthenticated, ]
 
     def get_queryset(self):
-        if self.action == "add_favorite":
+        if self.action == "edit_favorite":
             return ArtistModel.objects.all()
         return FavoriteArtistModel.objects.filter(user=self.request.user)
 
     @action(['post', 'delete'], detail=True)
-    def add_favorite(self, request, *args, **kwargs):
+    def edit_favorite(self, request, *args, **kwargs):
         user = request.user
         try:
             artist = self.get_object()

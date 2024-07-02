@@ -4,9 +4,12 @@ __pycache__/
 *$py.class
 .vscode/
 # TODO
-*/users/views.py
+# */users/views.py
 # */users/migrations/
-*/media-back/
+# */artists/migrations/
+# */artworks/migrations/
+# */market/migrations/
+# */media-back/
 # *Dockerfile
 # C extensions
 *.so

@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -150,9 +151,9 @@ REST_FRAMEWORK = {
 # Djoser
 DJOSER = {
     'PERMISSIONS': {
-        'user_list': ['rest_framework.permissions.AllowAny'],
-        'user': ['api.permissions.IsOwnerProfileOrReadOnly'],
-        'me': ['api.permissions.IsOwnerProfile']
+        'user_list': ['rest_framework.permissions.IsAdminUser'],
+        'user': ['api.permissions.IsOwnerProfile'],
+        'me': ['rest_framework.permissions.IsAuthenticated']
     },
     'SERIALIZERS': {
         'user_create': 'api.serializers.UserCreateSerializer',

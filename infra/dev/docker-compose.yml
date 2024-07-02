@@ -10,6 +10,15 @@ services:
     ports:
       - 5432:5432
 
+  frontend:
+    image: hackathonsagaart/sagaart_frontend:hackathon
+    volumes:
+      - ./data/frontend/:/app/result_build/
+    depends_on:
+      - backend
+    # env_file:
+    #  - ./.env
+
   backend:
     image: hackathonsagaart/sagaart_backend:hackathon
     restart: always
