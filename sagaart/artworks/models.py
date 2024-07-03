@@ -149,7 +149,9 @@ class ArtworkModel(models.Model):
         super().clean()
         if not self.is_estimate and self.is_on_sold != 'not posted':
             raise ValidationError(
-                {'is_on_sold': 'Нельзя выставить на продажу, если оценка не получена'}
+                {
+                    'is_on_sold': 'Нельзя выставить на продажу, если оценка не получена'
+                }
             )
 
 

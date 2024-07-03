@@ -170,15 +170,29 @@ class ArtObjectSerializer(ArtListSerializer):
     author_name = serializers.CharField(
         source='author.name', read_only=True
     )
-    author_photo = serializers.ImageField(
-        source='author.photo', read_only=True
-    )
+    # author_photo = serializers.ImageField(
+    #    source='author.photo', read_only=True
+    # )
+    author_photo = serializers.SerializerMethodField()
     author_user_id = serializers.IntegerField(
         source='author.user_id', read_only=True
     )
+    imageUrl = serializers.SerializerMethodField()
     original_price = serializers.SerializerMethodField()
     poster_price = serializers.SerializerMethodField()
     to_review = serializers.BooleanField(write_only=True, default=False)
+
+    def get_author_photo(self, obj):
+        # Вернуть относительный путь к изображению автора
+        if obj.image:
+            return f'/media-back/{obj.author.photo.name}'
+        return None
+
+    def get_imageUrl(self, obj):
+        # Вернуть относительный путь к изображению
+        if obj.image:
+            return f'/media-back/{obj.image.name}'
+        return None
 
     def get_original_price(self, obj):
         result = ArtworkPriceModel.objects.filter(artwork=obj.id).first()
