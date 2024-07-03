@@ -32,31 +32,35 @@ const ArtCard: FC<ArtCardProps> = ({
   };
 
   const handleAddToFavorites = () => {
-    addToFavorites({
-      artName: title,
-      artId: id,
-      artPhoto: imageUrl,
-      artistName: artist,
-    })
-      .then((res) => {
-        handleAddToArray !== undefined && handleAddToArray({ artId: id });
-        console.log(res);
+    if (handleAddToArray !== undefined) {
+      addToFavorites({
+        artName: title,
+        artId: id,
+        artPhoto: imageUrl,
+        artistName: artist,
       })
-      .catch((err) => {
-        console.log(err);
-        return;
-      });
+        .then((res) => {
+          handleAddToArray !== undefined && handleAddToArray({ artId: id });
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log(err);
+          return;
+        });
+    }
   };
 
   const handleRemoveFromFavorites = () => {
-    removeFromFavorites({ artId: id })
-      .then(() => {
-        handleRemoveFromArray({ removedArtId: id });
-      })
-      .catch((err) => {
-        console.log(err);
-        return;
-      });
+    if (handleRemoveFromArray !== undefined) {
+      removeFromFavorites({ artId: id })
+        .then(() => {
+          handleRemoveFromArray({ removedArtId: id });
+        })
+        .catch((err) => {
+          console.log(err);
+          return;
+        });
+    }
   };
 
   return (

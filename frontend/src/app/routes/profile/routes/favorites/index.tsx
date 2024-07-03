@@ -8,6 +8,7 @@ import { ArtInFavorites } from './constants/types';
 import styles from './constants/styles';
 
 import ChevronIcon from './assets/chevronDown.svg?react';
+
 import ArtCard from '../../../../../features/ArtCard';
 
 const Favorites = () => {
@@ -16,7 +17,6 @@ const Favorites = () => {
 
   useEffect(() => {
     getFavoriteArts().then((res) => {
-      console.log(res);
       setArts(res);
     });
   }, []);

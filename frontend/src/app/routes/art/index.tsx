@@ -225,32 +225,8 @@ const Art = () => {
               <Typography sx={styles.artistTextDefault}>
                 {art?.about_author}
               </Typography>
-              {/* <Typography sx={styles.artistTextDefault}>
-                {artMockData.artist.mentors}
-              </Typography> */}
             </Box>
-            {/* <Box>
-              {artMockData.artist.study.map((data, i) => {
-                return (
-                  <Typography key={i} sx={styles.artistTextDefault}>
-                    {data.period + ' - ' + data.institutionName}
-                  </Typography>
-                );
-              })}
-            </Box> */}
           </Box>
-          {/* <Box sx={styles.artistExhibitions}>
-            <Typography sx={styles.artistTextBold}>{artistTitle}</Typography>
-            <Box sx={styles.artistExhibitionsContainer}>
-              {artMockData.artist.exhibitions.map((exhibition, i) => {
-                return (
-                  <Typography key={i} sx={styles.artistTextDefault}>
-                    {exhibition.year + ' - ' + exhibition.info}
-                  </Typography>
-                );
-              })}
-            </Box>
-          </Box> */}
         </Box>
       </Box>
     </Box>

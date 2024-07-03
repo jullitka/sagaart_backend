@@ -1,5 +1,6 @@
-import { Box, InputLabel, OutlinedInput } from '@mui/material';
 import { FC } from 'react';
+
+import { Box, InputLabel, OutlinedInput } from '@mui/material';
 
 interface FormInputProps {
   label: string;

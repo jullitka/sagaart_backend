@@ -33,13 +33,13 @@ import {
 import styles from './constants/styles';
 
 import CloseIcon from './assets/close.svg?react';
-import Logo from '../../shared/ui/Logo';
 import AppleIcon from './assets/apple.svg?react';
 import GoogleIcon from './assets/google.svg?react';
 import ShowIcon from './assets/show.svg?react';
 import HideIcon from './assets/hide.svg?react';
 
 import Button from '../../shared/ui/Button';
+import Logo from '../../shared/ui/Logo';
 
 interface SignUpProps {
   handleClose: () => void;

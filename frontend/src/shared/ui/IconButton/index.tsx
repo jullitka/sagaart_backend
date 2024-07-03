@@ -2,6 +2,8 @@ import { Box, IconButton as MuiIconButton } from '@mui/material';
 import { FC } from 'react';
 
 interface IconButtonProps {
+  // Мы не знаем какой тип нужно задать чтобы не было ошибки
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   SvgIcon: any;
   isCart?: boolean;
   numberOfProducts?: string;

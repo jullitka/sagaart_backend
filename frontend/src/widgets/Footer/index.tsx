@@ -1,5 +1,4 @@
 import { NavLink } from 'react-router-dom';
-import './Footer.css';
 
 import { Box, Typography } from '@mui/material';
 import {
@@ -16,13 +15,14 @@ import {
   mainRoute,
 } from './constants/data';
 import styles from './constants/styles';
+import './Footer.css';
 
 import TwitterIcon from './assets/twitter.svg?react';
 import InstagramIcon from './assets/instagram.svg?react';
 import TelegramIcon from './assets/telegram.svg?react';
-import Logo from '../../shared/ui/Logo';
 
 import IconButton from '../../shared/ui/IconButton';
+import Logo from '../../shared/ui/Logo';
 
 const Footer = () => {
   return (

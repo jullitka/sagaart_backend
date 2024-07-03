@@ -6,7 +6,7 @@ interface ArtCardProps {
   original: number;
   print: number;
   isInFavorites: boolean;
-  handleRemoveFromArray: ({ removedArtId }: { removedArtId: number }) => void;
+  handleRemoveFromArray?: ({ removedArtId }: { removedArtId: number }) => void;
   handleAddToArray?: ({ artId }: { artId: number }) => void;
 }
 

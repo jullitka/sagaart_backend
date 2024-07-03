@@ -9,7 +9,6 @@ import ArtCard from '../../../../../features/ArtCard';
 const OnSale = () => {
   return (
     <Box sx={styles.onSale}>
-      {/* <Typography sx={styles.title}>{title.dontHaveArts}</Typography> */}
       <Typography sx={styles.title}>{title.haveArts}</Typography>
       <Masonry columns={3} spacing={5} sx={{ maxWidth: '1310px' }}>
         {arts.map((art, i) => {

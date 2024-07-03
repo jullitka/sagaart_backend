@@ -107,5 +107,5 @@ export {
   profileTitle,
   profileNavLinks,
   socialsTitle,
-  mainRoute
+  mainRoute,
 };

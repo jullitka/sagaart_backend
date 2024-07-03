@@ -4,37 +4,42 @@
     <img src="public/logo.svg" alt="Logo" width="80" height="80">
   </a>
 
-# SAGAART
+# Sagaart
 
 ## О проекте:
 
 MVP маркетплейс предметов искусства.
 
 ## Основные возможности:
-* Покупка и прожада произведений искусства.
-* Профессиональная оценка стоимости произведений искусства.
-* Анализ стоимости произведения искусства в будущем.
-* Регистрация и авторизация.
-* Оформление подписки.
+
+- Покупка и прожада произведений искусства.
+- Профессиональная оценка стоимости произведений искусства.
+- Анализ стоимости произведения искусства в будущем.
+- Регистрация и авторизация.
+- Оформление подписки.
 
 ## Cсылка на заделпоенное приложение
-[SAGAART](https://sagaart.vercel.app/)
+
+[Sagaart](http://158.160.134.225/)
 
 ## Технологии:
 
-* React: 18.2.66(https://react.dev/)
-* React-dom: 18.2.22(https://react.dev/reference/react-dom)
-* typescript: 5.2.2(https://www.typescriptlang.org/)
-* vite: 5.2.0(https://vitejs.dev/)
-
+- [React](https://react.dev/)
+- [React-router-dom](https://reactrouter.com/en/main)
+- [React-hook-form](https://react-hook-form.com/)
+- [Typescript](https://www.typescriptlang.org/)
+- [Svgr](https://react-svgr.com/)
 
 ### Сборка и инструменты:
 
-- React Scripts, Vite: Для сборки и управления модулями.
-- [MUI](https://mui.com/): Для быстрой и простой разработки стилей.
-- [ESLint](https://eslint.org/): Инструменты для форматирования кода.
+- [Vite](https://vitejs.dev/): Для сборки и управления модулями.
+- [Material UI](https://mui.com/material-ui/): Для быстрой и простой разработки компонентов.
+- [ESLint](https://eslint.org/): Линтер.
 
+### Иконки и шрифты:
 
+- [Material Icons](https://mui.com/material-ui/material-icons/)
+- [Inter](https://fonts.google.com/specimen/Inter)
 
 ## Команда
 
@@ -44,13 +49,12 @@ MVP маркетплейс предметов искусства.
 
 Игорь Казаков (GitHub [FreyrsKept](https://github.com/FreyrsKept))
 
-
 ## Развёртывание проекта
 
 - Клонируйте репозиторий через командную строку:
 
 ```
-git clone git@github.com:Zikoshh/Sagaart.git
+git https://github.com/Zikoshh/Sagaart.git
 ```
 
 - Перейдите в локальную папку с проектом
@@ -60,14 +64,18 @@ git clone git@github.com:Zikoshh/Sagaart.git
 npm i
 ```
 
-- Запустите приложение одной из двух комманд:
+- Запустите приложение:
 
 Запуск прод билда
+
 ```
+npm ci
+npm run build
 npm run start
 ```
 
 Запуск дев билда
+
 ```
 npm run dev
 ```

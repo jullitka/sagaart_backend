@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink as RouterNavLink } from 'react-router-dom';
 
 import { Box, Button as MuiButton } from '@mui/material';
 import {
@@ -22,7 +22,6 @@ import NavLink from '../../shared/ui/NavLink';
 import Button from '../../shared/ui/Button';
 import IconButton from '../../shared/ui/IconButton';
 import Logo from '../../shared/ui/Logo';
-import { NavLink as RouterNavLink } from 'react-router-dom';
 
 interface HeaderProps {
   isLoggedIn: boolean;

@@ -20,19 +20,17 @@ import {
   yetFirstPart,
   yetSecondPart,
   inputsData,
-  emailRegex,
-  passwordRegex,
 } from './constants/data';
 import styles from './constants/styles';
 
 import CloseIcon from './assets/close.svg?react';
-import Logo from '../../shared/ui/Logo';
 import AppleIcon from './assets/apple.svg?react';
 import GoogleIcon from './assets/google.svg?react';
 import ShowIcon from './assets/show.svg?react';
 import HideIcon from './assets/hide.svg?react';
 
 import Button from '../../shared/ui/Button';
+import Logo from '../../shared/ui/Logo';
 
 interface SignUpProps {
   handleClose: () => void;
@@ -99,7 +97,6 @@ const SignIn: FC<SignUpProps> = ({
             <OutlinedInput
               {...register(inputsData.email.name, {
                 required: true,
-                pattern: emailRegex,
               })}
               sx={styles.input}
               id={inputsData.email.name}
@@ -118,7 +115,6 @@ const SignIn: FC<SignUpProps> = ({
             <OutlinedInput
               {...register(inputsData.password.name, {
                 required: true,
-                pattern: passwordRegex,
               })}
               type={showPassword ? 'text' : 'password'}
               sx={styles.passwordInput}

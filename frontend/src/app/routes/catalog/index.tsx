@@ -11,6 +11,7 @@ import ChevronLeftIcon from './assets/chevronLeft.svg?react';
 import ChevronRightIcon from './assets/chevronRight.svg?react';
 import ChevronDownIcon from './assets/chevronDown.svg?react';
 import FilterIcon from './assets/filter.svg?react';
+
 import ArtCard from '../../../features/ArtCard';
 
 const Catalog = () => {
@@ -19,21 +20,29 @@ const Catalog = () => {
   const [arts, setArts] = useState<Art[]>([]);
 
   useEffect(() => {
-    Promise.all([
-      getArts({ limit: artsLimit, offset: offset }),
-      getFavoriteArts(),
-    ]).then(([{ results }, favoriteArts]) => {
-      const sortedArts = results.map((art: Art) => {
-        return {
-          ...art,
-          isInFavorites: favoriteArts.some(
-            (favoriteArt: ArtInFavorites) => favoriteArt.artwork === art.id
-          ),
-        };
-      });
+    const token = localStorage.getItem('token');
 
-      setArts(sortedArts);
-    });
+    if (token) {
+      Promise.all([
+        getArts({ limit: artsLimit, offset: offset }),
+        getFavoriteArts(),
+      ]).then(([{ results }, favoriteArts]) => {
+        const sortedArts = results.map((art: Art) => {
+          return {
+            ...art,
+            isInFavorites: favoriteArts.some(
+              (favoriteArt: ArtInFavorites) => favoriteArt.artwork === art.id
+            ),
+          };
+        });
+
+        setArts(sortedArts);
+      });
+    } else {
+      getArts({ limit: artsLimit, offset: offset }).then(({ results }) => {
+        setArts(results);
+      });
+    }
   }, [offset]);
 
   const handlePagination = (_e: ChangeEvent<unknown>, value: number) => {

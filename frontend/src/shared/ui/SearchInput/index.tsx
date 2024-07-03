@@ -1,4 +1,5 @@
 import { InputAdornment, OutlinedInput } from '@mui/material';
+
 import SearchIcon from '../../assets/search.svg?react';
 
 const SearchInput = () => {

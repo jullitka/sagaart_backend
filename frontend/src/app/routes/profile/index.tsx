@@ -1,4 +1,7 @@
 import { Dispatch, SetStateAction } from 'react';
+import { Outlet, useNavigate, useOutletContext } from 'react-router-dom';
+import { logOutHandler } from './utils';
+
 import { Avatar, Box, Button, Typography } from '@mui/material';
 import { navLinks, buttons } from './constants/data';
 import styles from './constants/styles';
@@ -6,8 +9,6 @@ import styles from './constants/styles';
 import avatarImg from './assets/avatar.jpeg';
 
 import NavLink from '../../../shared/ui/NavLink';
-import { Outlet, useNavigate, useOutletContext } from 'react-router-dom';
-import { logOutHandler } from './utils';
 
 interface OutletProps {
   setIsLoggedIn: Dispatch<SetStateAction<boolean>>;

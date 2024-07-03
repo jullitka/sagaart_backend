@@ -25,9 +25,9 @@ const ProfileMain = () => {
       <Box sx={styles.myOrders}>
         <Typography sx={styles.myOrdersTitle}>{myOrdersTitle}</Typography>
         <Box sx={styles.orders}>
-          {orders.map((order) => {
+          {orders.map((order, i) => {
             return (
-              <Box key={order.artName} sx={styles.order}>
+              <Box key={i} sx={styles.order}>
                 <Box component={'img'} src={order.img} sx={styles.artImg} />
                 <Box sx={styles.orderInfo}>
                   <Box sx={styles.deliveryInfo}>
@@ -58,15 +58,6 @@ const ProfileMain = () => {
       </Box>
       <Box sx={styles.myData}>
         <Typography sx={styles.myDataTitle}>{myDataTitle}</Typography>
-        {/* <Button
-          text={subscriptionButton.text}
-          bgColor={subscriptionButton.bgColor}
-          padding={subscriptionButton.padding}
-          fontSize={subscriptionButton.fontSize}
-          lineHeight={subscriptionButton.lineHeight}
-          width={subscriptionButton.width}
-          color={subscriptionButton.color}
-        /> */}
         <Box sx={styles.subscription}>
           <Box sx={styles.subscriptionInfo}>
             <Typography sx={styles.subscriptionTitle}>

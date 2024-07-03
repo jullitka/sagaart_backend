@@ -116,12 +116,12 @@ class ArtListSerializer(serializers.ModelSerializer):
     description = serializers.CharField()
     series = serializers.CharField()
     # imageUrl = Base64ImageField(source='image')
-    imageurl = serializers.SerializerMethodField()
+    imageUrl = serializers.SerializerMethodField()
     original_price = serializers.SerializerMethodField()
     poster_price = serializers.SerializerMethodField()
     is_favorite = serializers.SerializerMethodField()
 
-    def get_imageurl(self, obj):
+    def get_imageUrl(self, obj):
         # Вернуть относительный путь к изображению
         if obj.image:
             return f'/media-back/{obj.image.name}'

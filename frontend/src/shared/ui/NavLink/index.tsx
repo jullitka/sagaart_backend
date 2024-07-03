@@ -1,7 +1,8 @@
-import { Typography } from '@mui/material';
-import { NavLink as Link } from 'react-router-dom';
-import './NavLink.css';
 import { FC } from 'react';
+import { NavLink as Link } from 'react-router-dom';
+
+import { Typography } from '@mui/material';
+import './NavLink.css';
 
 interface NavLinkProps {
   route: string;

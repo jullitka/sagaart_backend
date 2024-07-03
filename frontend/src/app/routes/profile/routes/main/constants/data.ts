@@ -83,5 +83,5 @@ export {
   subscriptionButton,
   renewButton,
   cancelButton,
-  subscription
+  subscription,
 };

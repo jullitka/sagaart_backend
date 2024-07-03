@@ -47,20 +47,24 @@ const Appraisal: FC<AppraisalProps> = ({
     onSubmit();
   };
 
-  const handleFile = (e) => {
-    setUploadedImg(e.target.result);
+  const handleFile = (e: ProgressEvent<FileReader>) => {
+    if (e.target && e.target.result) {
+      setUploadedImg(e.target.result as string);
+    }
   };
 
-  const handleChangeFile = (e) => {
-    const file = e.target.files[0];
-    const fileSize = formatBytes(file.size);
+  const handleChangeFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      const fileSize = formatBytes(file.size);
 
-    setImgName(file.name);
-    setImgSize(fileSize);
+      setImgName(file.name);
+      setImgSize(fileSize);
 
-    const reader = new FileReader();
-    reader.onload = handleFile;
-    reader.readAsDataURL(file);
+      const reader = new FileReader();
+      reader.onload = handleFile;
+      reader.readAsDataURL(file);
+    }
   };
 
   return (

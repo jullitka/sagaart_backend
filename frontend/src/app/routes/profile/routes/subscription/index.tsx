@@ -15,15 +15,6 @@ const Subscription = () => {
   return (
     <Box sx={styles.subscription}>
       <Typography sx={styles.title}>{title}</Typography>
-      {/* <Button
-          text={subscriptionButton.text}
-          bgColor={subscriptionButton.bgColor}
-          padding={subscriptionButton.padding}
-          fontSize={subscriptionButton.fontSize}
-          lineHeight={subscriptionButton.lineHeight}
-          width={subscriptionButton.width}
-          color={subscriptionButton.color}
-        /> */}
       <Box sx={styles.subscriptionContainer}>
         <Box sx={styles.subscriptionInfo}>
           <Typography sx={styles.subscriptionTitle}>

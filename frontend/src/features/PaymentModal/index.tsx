@@ -11,12 +11,12 @@ import {
 import { buyButton, inputPlaceholder, logoSize, title } from './constants/data';
 import styles from './constants/styles';
 
-import Logo from '../../shared/ui/Logo';
 import CloseIcon from './assets/close.svg?react';
 import MirIcon from './assets/mir.svg?react';
 import PenIcon from './assets/pen.svg?react';
 
 import Button from '../../shared/ui/Button';
+import Logo from '../../shared/ui/Logo';
 
 interface PaymentModalProps {
   open: boolean;
