@@ -185,13 +185,13 @@ class ArtObjectSerializer(ArtListSerializer):
     def get_author_photo(self, obj):
         # Вернуть относительный путь к изображению автора
         if obj.image:
-            return f'/media-back/{obj.author.photo.name}'
+            return obj.author.photo.name
         return None
 
     def get_imageUrl(self, obj):
         # Вернуть относительный путь к изображению
         if obj.image:
-            return f'/media-back/{obj.image.name}'
+            return obj.image.name
         return None
 
     def get_original_price(self, obj):
