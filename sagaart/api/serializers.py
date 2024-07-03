@@ -115,10 +115,17 @@ class ArtListSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source='user.email', write_only=True)
     description = serializers.CharField()
     series = serializers.CharField()
-    imageUrl = Base64ImageField(source='image')
+    # imageUrl = Base64ImageField(source='image')
+    imageUrl = serializers.SerializerMethodField()
     original_price = serializers.SerializerMethodField()
     poster_price = serializers.SerializerMethodField()
     is_favorite = serializers.SerializerMethodField()
+    
+    def get_imageUrl(self, obj):
+        # Вернуть относительный путь к изображению
+        if obj.image:
+            return f'media-back/{obj.image.name}'
+        return None
 
     def get_original_price(self, obj):
         result = ArtworkPriceModel.objects.filter(artwork=obj.id).first()
